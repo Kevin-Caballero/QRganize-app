@@ -84,3 +84,4 @@ src/environments/.env.sample
 src/environments/environment.mobile.ts
 src/environments/environment.proxy.ts
 src/environments/environment.ts
+src/environments/environment.prod.ts
