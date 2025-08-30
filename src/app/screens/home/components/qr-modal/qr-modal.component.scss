@@ -1,0 +1,46 @@
+@media print {
+  ion-header,
+  .qr-container button {
+    display: none;
+  }
+  .qr-container {
+    text-align: center;
+    margin-top: 100px;
+
+    img {
+      width: 500px;
+      height: 500px;
+    }
+  }
+}
+
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  page-break-inside: avoid;
+
+  .qr-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--ion-color-dark);
+  }
+
+  img {
+    max-width: 250px;
+    height: auto;
+  }
+}
+
+/* Para pantallas grandes, mostrar en cuadrícula */
+@media (min-width: 768px) {
+  ion-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+}

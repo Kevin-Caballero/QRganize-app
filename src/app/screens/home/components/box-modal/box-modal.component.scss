@@ -1,0 +1,73 @@
+.container {
+  display: flex;
+  margin: 0 auto;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 16px;
+  text-align: center;
+  max-width: 600px;
+
+  .box-form {
+    padding: 1rem;
+    border-radius: 10px;
+    background: rgba(136, 152, 235, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    ion-item {
+      margin-top: 16px;
+    }
+
+    .file-button {
+      width: 100%;
+      padding: 1rem;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 8px;
+
+      .file-name {
+        max-width: 45dvw;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        font-size: 0.95rem;
+      }
+    }
+  }
+
+  .image-container {
+    height: 200px;
+    width: 100%;
+    border-radius: 8px;
+    background-color: #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder-text {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-align: center;
+    color: #ccc;
+  }
+
+  ion-card-header,
+  ion-card-title,
+  ion-card-subtitle {
+    text-align: left;
+  }
+}

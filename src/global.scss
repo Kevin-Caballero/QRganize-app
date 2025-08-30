@@ -1,0 +1,192 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+swiper-container {
+  --swiper-pagination-bullet-inactive-color: var(
+    --ion-text-color-step-800,
+    #cccccc
+  );
+  --swiper-pagination-color: var(--ion-color-primary, #0054e9);
+  --swiper-pagination-progressbar-bg-color: rgba(
+    var(--ion-text-color-rgb, 0, 0, 0),
+    0.25
+  );
+  --swiper-scrollbar-bg-color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.1);
+  --swiper-scrollbar-drag-bg-color: rgba(
+    var(--ion-text-color-rgb, 0, 0, 0),
+    0.5
+  );
+}
+
+swiper-slide {
+  display: flex;
+  position: relative;
+
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  font-size: 18px;
+
+  text-align: center;
+  box-sizing: border-box;
+}
+
+swiper-slide img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+/* Global styles for ion-select popover */
+ion-select-popover {
+  --background: #2a3142;
+  --color: #ffffff;
+  --border-color: #3a4556;
+  --min-width: 300px;
+  --width: auto;
+  --max-width: 400px;
+
+  .popover-content {
+    background: #2a3142;
+    color: #ffffff;
+    border: 1px solid #3a4556;
+    border-radius: 12px;
+    min-width: 300px;
+    max-width: 400px;
+    width: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .popover-arrow {
+    display: none;
+  }
+
+  ion-item {
+    --background: #2a3142;
+    --color: #ffffff;
+    --border-color: transparent;
+    --inner-border-width: 0;
+    --border-width: 0;
+    border-bottom: 1px solid #3a4556;
+    min-height: 48px;
+    padding: 8px 16px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      --background: #3a4556;
+    }
+
+    &.item-radio-checked {
+      --background: #8c9eff;
+      --color: #ffffff;
+    }
+
+    ion-label {
+      color: #ffffff !important;
+      font-size: 16px !important;
+      font-weight: 400 !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  ion-radio {
+    --color: #ffffff;
+    --color-checked: #ffffff;
+    --border-color: #8c9eff;
+    --border-color-checked: #8c9eff;
+    margin-inline-end: 12px;
+  }
+}
+
+/* Estilos personalizados para Toast */
+.toast-success {
+  --background: #3a4556;
+  --color: #ffffff;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --min-height: 48px;
+  --font-size: 14px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  text-align: center;
+
+  &::part(message) {
+    font-weight: 500;
+  }
+}
+
+/* Estilos para el escáner de QR */
+.scanner-active {
+  --background: transparent;
+  --ion-background-color: transparent;
+}
+
+body.scanner-active {
+  --background: transparent;
+  --ion-background-color: transparent;
+  background: transparent !important;
+}
+
+body.scanner-active ion-content,
+body.scanner-active .ion-page,
+body.scanner-active ion-app {
+  background: transparent !important;
+  --background: transparent !important;
+}
+
+ion-app.scanner-active {
+  background: transparent !important;
+}
+
+/* Estilos para asegurar que el escáner de QR sea visible */
+ion-app.scanner-active ion-content {
+  --background: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Hacer que el modal de escáner sea transparente */
+.qr-scanner-modal {
+  --background: transparent;
+  --backdrop-opacity: 0;
+
+  .modal-wrapper {
+    background: transparent;
+  }
+}

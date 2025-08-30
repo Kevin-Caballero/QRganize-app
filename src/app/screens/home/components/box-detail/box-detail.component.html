@@ -1,0 +1,210 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ box?.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="onEditBox()">
+        <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content
+  padding
+  style="background: #1b233d"
+  class="ion-padding"
+  [fullscreen]="true"
+  [scrollEvents]="true"
+  (ionScroll)="logScrolling($event)"
+>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>{{ box?.name }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col>
+            <div class="box">
+              <ion-label>Box Image</ion-label>
+              <ion-note color="primary" slot="end">
+                <img
+                  *ngIf="box.imageUrl; else noImage"
+                  style="border-radius: 50%"
+                  [src]="box.imageUrl"
+                  alt="box image"
+                  width="50px"
+                  height="50px"
+                  (click)="onImageClick(box.imageUrl)"
+                />
+                <ng-template #noImage>
+                  <ion-icon name="image-outline"></ion-icon>
+                </ng-template>
+              </ion-note>
+            </div>
+          </ion-col>
+          <ion-col>
+            <div class="box">
+              <ion-label>Created At</ion-label>
+              <ion-note color="primary" slot="end">{{
+                box.createdAt | date : "dd/MM/yyyy"
+              }}</ion-note>
+            </div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <div class="box">
+              <ion-label>Box Description</ion-label>
+              <ion-note color="primary" slot="end">{{
+                box.description
+              }}</ion-note>
+            </div>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <div class="box checklist-box">
+              <ion-label>Checklist</ion-label>
+              <div *ngIf="isLoadingChecklist">
+                <ion-spinner name="dots" size="small"></ion-spinner>
+              </div>
+              <ng-container *ngIf="!isLoadingChecklist">
+                <ion-chip
+                  color="primary"
+                  *ngIf="assignedChecklist"
+                  (click)="viewChecklist()"
+                >
+                  <ion-icon name="checkbox-outline"></ion-icon>
+                  <ion-label>{{ assignedChecklist.name }}</ion-label>
+                  <ion-icon name="chevron-forward"></ion-icon>
+                </ion-chip>
+                <ion-note color="medium" *ngIf="!assignedChecklist"
+                  >No checklist assigned</ion-note
+                >
+              </ng-container>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-button expand="block" color="primary" (click)="onAddItem()">
+      <ion-icon slot="start" name="add-outline"></ion-icon>
+      Add Item
+    </ion-button>
+
+    <!-- Items Summary -->
+    <div class="box" style="margin: 1em 0">
+      <ion-label *ngIf="items.length > 0">
+        There
+        <ng-container *ngIf="items.length === 1; else plural">
+          is
+        </ng-container>
+        <ng-template #plural> are </ng-template>
+        <ion-note color="primary" slot="end">{{ items?.length }}</ion-note>
+        item<ng-container *ngIf="items.length > 1">s</ng-container> in this box
+      </ion-label>
+      <ion-label *ngIf="items.length === 0 && !isLoadingItems">
+        <ion-note color="medium">No items in this box yet</ion-note>
+      </ion-label>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoadingItems" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <ion-text color="medium">Loading items...</ion-text>
+    </div>
+
+    <!-- Items List -->
+    <ion-list *ngIf="!isLoadingItems">
+      <ion-item *ngFor="let item of items" button>
+        <!-- Item Image or Icon with Quantity -->
+        <div class="icon-container" slot="start">
+          <ng-container *ngIf="getItemImageUrl(item); else defaultIcon">
+            <img
+              [src]="getItemImageUrl(item)"
+              alt="Item image"
+              class="item-image"
+              (click)="onImageClick(getItemImageUrl(item))"
+            />
+          </ng-container>
+          <ng-template #defaultIcon>
+            <ion-icon
+              name="cube-outline"
+              color="primary"
+              size="large"
+            ></ion-icon>
+          </ng-template>
+          <div class="quantity-badge">{{ item.quantity || 1 }}</div>
+        </div>
+
+        <!-- Item Info -->
+        <ion-label>
+          <!-- Item Properties - Ahora arriba -->
+          <div class="item-properties">
+            <!-- Fragile indicator -->
+            <ion-chip *ngIf="item.isFragile" color="warning" size="small">
+              <ion-icon name="warning-outline"></ion-icon>
+              <ion-label>Fragile</ion-label>
+            </ion-chip>
+
+            <!-- Expiration indicator -->
+            <ion-chip
+              *ngIf="item.expires && item.expirationDate"
+              color="danger"
+              size="small"
+            >
+              <ion-icon name="calendar-outline"></ion-icon>
+              <ion-label
+                >Expires:
+                {{ item.expirationDate | date : "M/d/yyyy" }}</ion-label
+              >
+            </ion-chip>
+
+            <!-- Image indicator -->
+            <ion-chip
+              *ngIf="getItemImageUrl(item)"
+              color="tertiary"
+              size="small"
+              (click)="
+                onImageClick(getItemImageUrl(item)); $event.stopPropagation()
+              "
+            >
+              <ion-icon name="image-outline"></ion-icon>
+              <ion-label>Photo</ion-label>
+              <ion-icon name="eye-outline" size="small"></ion-icon>
+            </ion-chip>
+          </div>
+
+          <!-- Nombre del item -->
+          <h2>{{ item.name }}</h2>
+
+          <ion-note color="medium">
+            Added: {{ item.createdAt | date : "M/d/yyyy, h:mm a" }}
+          </ion-note>
+        </ion-label>
+
+        <!-- Item Actions -->
+        <ion-buttons slot="end">
+          <ion-button
+            fill="clear"
+            (click)="onEditItem(item); $event.stopPropagation()"
+          >
+            <ion-icon name="create-outline" color="primary"></ion-icon>
+          </ion-button>
+          <ion-button
+            fill="clear"
+            (click)="onDeleteItem(item); $event.stopPropagation()"
+          >
+            <ion-icon name="trash-outline" color="danger"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-item>
+    </ion-list>
+  </ion-card>
+</ion-content>

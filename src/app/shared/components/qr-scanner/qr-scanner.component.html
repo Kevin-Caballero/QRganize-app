@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>QR Scanner</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="scanner-content">
+  <div class="scanner-container">
+    <!-- Scanner Area -->
+    <div class="scanner-area" *ngIf="!scanError">
+      <div class="scanner-overlay">
+        <div class="scanner-frame">
+          <div class="corner top-left"></div>
+          <div class="corner top-right"></div>
+          <div class="corner bottom-left"></div>
+          <div class="corner bottom-right"></div>
+        </div>
+      </div>
+
+      <div class="scanner-instructions">
+        <ion-text color="light">
+          <h3>Scan QR Code</h3>
+          <p>Position the QR code within the frame</p>
+        </ion-text>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="scanError">
+      <ion-icon name="alert-circle" color="danger" size="large"></ion-icon>
+      <ion-text color="danger">
+        <h3>Scanning Error</h3>
+        <p>{{ scanError }}</p>
+      </ion-text>
+      <ion-button expand="block" fill="outline" (click)="retryScanning()">
+        <ion-icon name="refresh" slot="start"></ion-icon>
+        Try Again
+      </ion-button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isScanning">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <ion-text color="medium">
+        <p>Scanning...</p>
+      </ion-text>
+    </div>
+  </div>
+
+  <!-- Cancel Button -->
+  <div class="action-buttons">
+    <ion-button expand="block" fill="clear" (click)="dismissModal()">
+      Cancel
+    </ion-button>
+  </div>
+</ion-content>

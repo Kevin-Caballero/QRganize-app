@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="onClose()"
+        ><ion-icon name="close"></ion-icon
+      ></ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Photo Preview</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="image-container">
+    <img
+      [src]="displayUrl || imageUrl"
+      alt="Image"
+      (error)="handleImageError()"
+    />
+  </div>
+
+  <!-- Mensaje de error si la imagen no pudo cargarse -->
+  <div
+    *ngIf="hasError && currentUrlIndex >= alternativeUrls.length"
+    class="error-message ion-padding"
+  >
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <p>No se pudo cargar la imagen.</p>
+  </div>
+</ion-content>

@@ -1,0 +1,157 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title></ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="confirm()"
+        [disabled]="!itemForm.valid"
+        [strong]="true"
+      >
+        {{ isEditing ? "Update" : "Confirm" }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="container">
+    <div class="item-form">
+      <H3>{{ isEditing ? "Edit an" : "Create an" }} <b>Item</b></H3>
+      <form [formGroup]="itemForm">
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Name"
+            formControlName="name"
+            placeholder="Glass cup"
+          >
+            <ion-icon slot="start" name="cube-outline"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            itemForm.get('name')?.invalid && itemForm.get('name')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          {{ nameError || "." }}
+        </ion-note>
+
+        <ion-item>
+          <ion-textarea
+            labelPlacement="stacked"
+            label="Description"
+            formControlName="description"
+            placeholder="Fragile glass cup for wine"
+            rows="3"
+          >
+            <ion-icon slot="start" name="chatbox-ellipses-outline"></ion-icon>
+          </ion-textarea>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            itemForm.get('description')?.invalid &&
+            itemForm.get('description')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          {{ descriptionError || "." }}
+        </ion-note>
+
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Quantity"
+            formControlName="quantity"
+            placeholder="1"
+            type="number"
+            min="1"
+            max="9999"
+          >
+            <ion-icon slot="start" name="layers-outline"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            itemForm.get('quantity')?.invalid &&
+            itemForm.get('quantity')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          {{ quantityError || "." }}
+        </ion-note>
+
+        <ion-item>
+          <ion-checkbox formControlName="isFragile" justify="space-between">
+            <ion-icon slot="start" name="warning-outline"></ion-icon>
+            Fragile Item
+          </ion-checkbox>
+        </ion-item>
+        <ion-note style="visibility: hidden">.</ion-note>
+
+        <ion-item>
+          <ion-checkbox
+            formControlName="expires"
+            justify="space-between"
+            (ionChange)="onExpiresChange()"
+          >
+            <ion-icon slot="start" name="time-outline"></ion-icon>
+            Item Expires
+          </ion-checkbox>
+        </ion-item>
+        <ion-note style="visibility: hidden">.</ion-note>
+
+        <!-- Calendario para fecha de expiración -->
+        <div *ngIf="itemForm.get('expires')?.value" class="expiration-section">
+          <ion-item>
+            <ion-label position="stacked">Expiration Date</ion-label>
+            <ion-datetime
+              formControlName="expirationDate"
+              presentation="date"
+              [showDefaultButtons]="false"
+              class="inline-datetime"
+            >
+            </ion-datetime>
+          </ion-item>
+        </div>
+
+        <ion-item>
+          <ion-label position="stacked">Image</ion-label>
+
+          <ion-button
+            fill="outline"
+            class="file-button"
+            (click)="takePicture()"
+            *ngIf="!imagePreview"
+          >
+            <ion-icon slot="start" name="camera-outline"></ion-icon>
+            Take Photo
+          </ion-button>
+
+          <div class="file-info" *ngIf="imagePreview">
+            <div class="file-name">
+              {{ selectedFileName || "Photo selected" }}
+            </div>
+            <ion-button fill="clear" (click)="takePicture()">
+              <ion-icon slot="start" name="refresh-outline"></ion-icon>
+              Change
+            </ion-button>
+          </div>
+        </ion-item>
+
+        <div class="image-preview-container" *ngIf="imagePreview">
+          <img [src]="imagePreview" alt="Selected image preview" />
+        </div>
+      </form>
+    </div>
+  </div>
+</ion-content>

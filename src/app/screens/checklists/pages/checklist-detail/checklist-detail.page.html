@@ -1,0 +1,128 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ checklist?.name || 'Checklist' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && checklist">
+    <!-- Checklist Header -->
+    <div class="checklist-header">
+      <ion-card
+        class="checklist-card"
+        style="
+          background: #222428 !important;
+          margin: 8px;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        "
+      >
+        <ion-card-header style="background: #222428 !important">
+          <div class="header-content">
+            <ion-card-title>{{ checklist.name }}</ion-card-title>
+            <!-- Box Assignment Info in header -->
+            <div class="box-chip">
+              <ion-chip color="secondary" *ngIf="checklist.boxId">
+                <ion-icon name="cube" slot="start"></ion-icon>
+                <ion-label>{{ getBoxName() }}</ion-label>
+              </ion-chip>
+              <ion-chip color="medium" *ngIf="!checklist.boxId">
+                <ion-icon name="cube-outline" slot="start"></ion-icon>
+                <ion-label>Not assigned</ion-label>
+              </ion-chip>
+            </div>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content style="background: #222428 !important">
+          <!-- Progress Info -->
+          <div class="progress-info">
+            <div class="progress-header">
+              <span class="progress-text">
+                {{ getCompletedItemsCount() }} of {{ checklist.items?.length ||
+                0 }} items completed
+              </span>
+              <span class="progress-percentage"
+                >{{ getCompletionPercentage() }}%</span
+              >
+            </div>
+            <ion-progress-bar
+              [value]="getCompletionPercentage() / 100"
+              [color]="getCompletionPercentage() === 100 ? 'success' : 'primary'"
+            >
+            </ion-progress-bar>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <ion-button fill="clear" size="small" (click)="openEditModal()">
+              <ion-icon name="create" slot="start"></ion-icon>
+              Edit
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              color="medium"
+              *ngIf="!checklist.boxId"
+              (click)="assignToBox()"
+            >
+              <ion-icon name="link" slot="start"></ion-icon>
+              Assign to Box
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              color="medium"
+              *ngIf="checklist.boxId"
+              (click)="unassignFromBox()"
+            >
+              <ion-icon name="unlink" slot="start"></ion-icon>
+              Unassign
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              color="danger"
+              (click)="deleteChecklist()"
+            >
+              <ion-icon name="trash" slot="start"></ion-icon>
+              Delete
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Checklist Items -->
+    <div class="checklist-items-section">
+      <app-checklist-items
+        [checklist]="checklist"
+        (checklistUpdated)="onChecklistUpdated()"
+      >
+      </app-checklist-items>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!loading && !checklist" class="error-state">
+    <ion-icon name="warning-outline" class="error-icon"></ion-icon>
+    <h2>Checklist Not Found</h2>
+    <p>The checklist you're looking for doesn't exist or has been deleted.</p>
+    <ion-button fill="solid" (click)="goBack()">
+      <ion-icon name="arrow-back" slot="start"></ion-icon>
+      Go Back
+    </ion-button>
+  </div>
+</ion-content>

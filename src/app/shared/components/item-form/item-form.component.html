@@ -1,0 +1,132 @@
+<div class="item-form-container">
+  <!-- Input par      <div
+      class="property-tag image-tag"
+      [class.active]="formData.hasImage"
+      (click)="toggleImage()"
+      *ngIf="showImage"
+    >
+      <ion-icon name="image-outline"></ion-icon>
+      <span>Photo</span>
+    </div>
+  </div>
+
+  <!-- Date Picker Modal -->
+  <ion-item class="name-item">
+    <ion-input
+      [(ngModel)]="formData.name"
+      placeholder="Enter item name"
+      [clearInput]="true"
+    >
+    </ion-input>
+  </ion-item>
+
+  <!-- Input para cantidad -->
+  <ion-item class="quantity-item" *ngIf="showQuantity">
+    <ion-input
+      type="number"
+      [(ngModel)]="formData.quantity"
+      placeholder="1"
+      min="1"
+      max="9999"
+    >
+      <ion-icon slot="start" name="layers-outline"></ion-icon>
+    </ion-input>
+    <ion-label slot="start">Quantity</ion-label>
+  </ion-item>
+
+  <!-- Tags de propiedades -->
+  <div class="property-tags">
+    <div
+      class="property-tag fragile-tag"
+      [class.active]="formData.fragile"
+      (click)="toggleFragile()"
+    >
+      <ion-icon name="warning-outline"></ion-icon>
+      <span>Fragile</span>
+    </div>
+
+    <div
+      class="property-tag expires-tag"
+      [class.active]="formData.expires"
+      (click)="formData.expires ? toggleExpires() : openDatePicker()"
+    >
+      <ion-icon name="calendar-outline"></ion-icon>
+      <span>
+        {{
+          formData.expires && formData.expirationDate
+            ? formatDate(formData.expirationDate)
+            : "Expires"
+        }}
+      </span>
+    </div>
+
+    <div
+      class="property-tag image-tag"
+      [class.active]="formData.hasImage"
+      (click)="toggleImage()"
+      *ngIf="showImage"
+    >
+      <ion-icon name="image-outline"></ion-icon>
+      <span>Photo</span>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="form-actions" *ngIf="showSaveButton || showCancelButton">
+    <ion-button
+      *ngIf="showCancelButton"
+      fill="clear"
+      color="medium"
+      (click)="onCancel()"
+    >
+      {{ cancelButtonText }}
+    </ion-button>
+    <ion-button
+      *ngIf="showSaveButton"
+      fill="solid"
+      color="primary"
+      (click)="onSave()"
+      [disabled]="!formData.name.trim()"
+    >
+      {{ saveButtonText }}
+    </ion-button>
+  </div>
+
+  <!-- Date Picker Modal -->
+  <ion-modal [isOpen]="showDatePicker" [cssClass]="'date-picker-modal'">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="hideDatePicker()">CANCEL</ion-button>
+          </ion-buttons>
+          <ion-title>Select expiration date</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="confirmDate()" strong="true">DONE</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding calendar-content">
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+          "
+        >
+          <ion-datetime
+            presentation="date"
+            [value]="formData.expirationDate"
+            (ionChange)="onExpiresChange($event)"
+            [min]="minDate"
+            [showDefaultButtons]="false"
+            locale="es-ES"
+            class="centered-calendar"
+          >
+          </ion-datetime>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</div>

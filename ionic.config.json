@@ -1,0 +1,7 @@
+{
+  "name": "QRganize-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,156 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? "Edit Box" : "New Box" }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="confirm()"
+        [disabled]="boxForm.invalid"
+        [strong]="true"
+        >Confirm</ion-button
+      >
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content class="ion-padding">
+  <div class="container">
+    <div class="box-form">
+      <H3>{{ isEditMode ? "Edit" : "Create a" }} <b>Box</b></H3>
+      <form [formGroup]="boxForm">
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Name"
+            formControlName="name"
+            placeholder="Fragile box"
+            [maxlength]="nameMaxLength"
+          >
+            <ion-icon slot="start" name="cube-outline"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            boxForm.get('name')?.invalid && boxForm.get('name')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          {{ showErrorMessage("name") || "." }}
+        </ion-note>
+
+        <ion-item>
+          <ion-textarea
+            labelPlacement="stacked"
+            label="Description"
+            formControlName="description"
+            placeholder="Fragile box with glass inside"
+            [maxlength]="descriptionMaxLength"
+          >
+            <ion-icon slot="start" name="chatbox-ellipses-outline"></ion-icon>
+          </ion-textarea>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            boxForm.get('description')?.invalid &&
+            boxForm.get('description')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          {{ showErrorMessage("description") || "." }}
+        </ion-note>
+
+        <ion-item>
+          <ion-label position="stacked">Image</ion-label>
+
+          <input
+            type="file"
+            id="fileInput"
+            hidden
+            (change)="onFileSelected($event)"
+            #fileInput
+          />
+
+          <ion-button
+            fill="outline"
+            class="file-button"
+            (click)="fileInput.click()"
+            *ngIf="!selectedFileName"
+          >
+            <ion-icon slot="start" name="image-outline"></ion-icon>
+            Choose file
+          </ion-button>
+          <div class="file-info" *ngIf="selectedFileName">
+            <div id="click-trigger" class="file-name">
+              {{ selectedFileName }}
+            </div>
+            <ion-popover trigger="click-trigger" triggerAction="click">
+              <ng-template>
+                <ion-content class="ion-padding">{{
+                  selectedFileName
+                }}</ion-content>
+              </ng-template>
+            </ion-popover>
+            <ion-button fill="clear" (click)="changeFile()">
+              <ion-icon slot="start" name="refresh-outline"></ion-icon>
+              Change
+            </ion-button>
+          </div>
+        </ion-item>
+
+        <!-- Checklist Selection -->
+        <ion-item>
+          <ion-select
+            labelPlacement="stacked"
+            label="Checklist (Optional)"
+            formControlName="checklistId"
+            placeholder="Select a checklist to assign"
+            interface="popover"
+          >
+            <ion-icon slot="start" name="list-outline"></ion-icon>
+            <ion-select-option [value]="null">None</ion-select-option>
+            <ion-select-option
+              *ngFor="let checklist of availableChecklists"
+              [value]="checklist.id"
+            >
+              {{ checklist.name }}
+            </ion-select-option>
+          </ion-select>
+          <ion-note *ngIf="isLoadingChecklists">Loading checklists...</ion-note>
+          <ion-note
+            *ngIf="!isLoadingChecklists && availableChecklists.length === 0"
+          >
+            No available checklists found
+          </ion-note>
+        </ion-item>
+      </form>
+    </div>
+
+    <ion-card *ngIf="boxForm">
+      <ion-card-header>
+        <ion-card-title>
+          {{ boxForm.get("name")?.value || "Your box name" }}
+        </ion-card-title>
+        <ion-card-subtitle>
+          {{ boxForm.value.description || "Some description..." }}
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="image-container">
+          <img
+            *ngIf="selectedImageUrl; else placeholder"
+            [src]="selectedImageUrl"
+            alt="Box preview"
+          />
+          <ng-template #placeholder>
+            <div class="placeholder-text">No image selected</div>
+          </ng-template>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

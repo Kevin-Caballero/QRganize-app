@@ -1,0 +1,240 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+// Force dark background for all cards in this page
+ion-card {
+  background: #222428 !important;
+
+  ion-card-header {
+    background: #222428 !important;
+  }
+
+  ion-card-content {
+    background: #222428 !important;
+  }
+}
+.checklist-header {
+  padding: 16px;
+  padding-bottom: 0;
+
+  .checklist-card {
+    margin: 0;
+    background: #222428 !important;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    ion-card-header {
+      padding-bottom: 8px;
+      background: #222428 !important;
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        ion-card-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: #ffffff !important;
+          flex: 1;
+          margin: 0;
+          margin-right: 12px;
+        }
+
+        .box-chip {
+          flex-shrink: 0;
+
+          ion-chip {
+            margin: 0;
+            font-size: 12px;
+            height: 28px;
+          }
+        }
+      }
+
+      ion-card-subtitle {
+        font-size: 14px;
+        color: var(--ion-color-medium);
+        margin-top: 4px;
+        line-height: 1.4;
+      }
+    }
+
+    ion-card-content {
+      padding-top: 8px;
+      background: #222428 !important;
+    }
+  }
+}
+
+.progress-info {
+  margin-bottom: 20px;
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .progress-text {
+      font-size: 14px;
+      color: #b0b0b0;
+      font-weight: 500;
+    }
+
+    .progress-percentage {
+      font-size: 14px;
+      color: var(--ion-color-primary);
+      font-weight: 600;
+    }
+  }
+
+  ion-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  flex-wrap: nowrap;
+  margin-top: 8px;
+  overflow-x: auto;
+
+  ion-button {
+    margin: 0;
+    font-size: 12px !important;
+    height: 36px !important;
+    --padding-start: 8px;
+    --padding-end: 8px;
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: fit-content;
+
+    ion-icon {
+      font-size: 16px !important;
+    }
+  }
+}
+
+.checklist-items-section {
+  padding: 0 16px 16px;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 400px;
+
+  .error-icon {
+    font-size: 80px;
+    color: var(--ion-color-warning);
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    color: var(--ion-color-dark);
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin-bottom: 30px;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .checklist-header {
+    padding: 12px;
+    padding-bottom: 0;
+
+    ion-card {
+      ion-card-header {
+        ion-card-title {
+          font-size: 18px;
+        }
+
+        ion-card-subtitle {
+          font-size: 13px;
+        }
+      }
+    }
+  }
+
+  .box-assignment {
+    .assigned-box,
+    .unassigned-box {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+
+      ion-button {
+        align-self: stretch;
+      }
+    }
+  }
+
+  .action-buttons {
+    ion-button {
+      flex: 1;
+      font-size: 11px;
+      height: 30px;
+    }
+  }
+
+  .checklist-items-section {
+    padding: 0 12px 12px;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .checklist-header {
+    .checklist-card {
+      background: var(--ion-color-dark) !important;
+
+      ion-card-header {
+        background: var(--ion-color-dark) !important;
+
+        .header-content {
+          ion-card-title {
+            color: #ffffff !important;
+          }
+        }
+      }
+
+      ion-card-content {
+        background: var(--ion-color-dark) !important;
+      }
+    }
+  }
+
+  .progress-info {
+    .progress-header {
+      .progress-text {
+        color: #b0b0b0 !important;
+      }
+    }
+  }
+
+  .error-state {
+    h2 {
+      color: var(--ion-color-light);
+    }
+  }
+}

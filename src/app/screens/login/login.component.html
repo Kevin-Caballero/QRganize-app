@@ -1,0 +1,120 @@
+<ion-content [fullscreen]="true">
+  <div class="container">
+    <div class="logo-container">
+      <img
+        src="assets/qrganize_icon.png"
+        alt="QRganize Logo"
+        class="logo-image"
+      />
+    </div>
+    <div class="top">
+      <h2 class="title">Login Now</h2>
+      <p class="subtitle">Please login to continue using the app.</p>
+    </div>
+
+    <div class="social-login" *ngIf="socialLoginEnabled">
+      <ion-button
+        expand="block"
+        class="twitter"
+        (click)="socialLogin(LoginType.TWITTER)"
+      >
+        <ion-icon name="logo-twitter"></ion-icon>
+      </ion-button>
+      <ion-button
+        expand="block"
+        class="facebook"
+        (click)="socialLogin(LoginType.FACEBOOK)"
+      >
+        <ion-icon name="logo-facebook"></ion-icon>
+      </ion-button>
+      <ion-button
+        expand="block"
+        class="google"
+        (click)="socialLogin(LoginType.GOOGLE)"
+      >
+        <ion-icon name="logo-google"></ion-icon>
+      </ion-button>
+    </div>
+    <p class="or-login-with-email" *ngIf="socialLoginEnabled">
+      Or login with email
+    </p>
+
+    <div class="login-form">
+      <form [formGroup]="loginForm">
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Email"
+            formControlName="email"
+            placeholder="john_doe&#64;gmail.com"
+          >
+            <ion-icon slot="start" name="mail"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          Email is required and must be valid.
+        </ion-note>
+
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Password"
+            formControlName="password"
+            placeholder="* * * * * * * *"
+            [type]="passInputType"
+          >
+            <ion-icon slot="start" name="lock-closed"></ion-icon>
+            <ion-button
+              fill="clear"
+              slot="end"
+              aria-label="Show/hide"
+              (click)="changePassVisibility()"
+            >
+              <ion-icon slot="icon-only" name="eye"></ion-icon>
+            </ion-button>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          Password is required.
+        </ion-note>
+
+        <div class="remember-me">
+          <ion-button
+            *ngIf="resetPasswordAvailable"
+            fill="clear"
+            style="margin: 0"
+            class="forgot-password-btn"
+            (click)="forgotPassword()"
+            >Forgot password?</ion-button
+          >
+          <div *ngIf="!resetPasswordAvailable" style="width: 100%"></div>
+          <ion-checkbox labelPlacement="end" formControlName="rememberMe"
+            >Remember me</ion-checkbox
+          >
+        </div>
+      </form>
+    </div>
+
+    <div class="bottom">
+      <ion-button class="login" [disabled]="loginForm.invalid" (click)="login()"
+        >Login</ion-button
+      >
+      <p>Don't have an account? <a (click)="navigateToRegister()">Signup</a></p>
+    </div>
+  </div>
+</ion-content>

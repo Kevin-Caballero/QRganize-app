@@ -1,0 +1,149 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Search</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Search</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Search Header -->
+  <div class="search-header">
+    <ion-searchbar
+      [(ngModel)]="searchTerm"
+      (ionInput)="onSearchInput($event)"
+      placeholder="Search boxes and items by name or description"
+      debounce="300"
+      show-clear-button="focus"
+    >
+    </ion-searchbar>
+
+    <ion-button
+      expand="block"
+      fill="outline"
+      class="qr-scan-button"
+      (click)="openQrScanner()"
+    >
+      <ion-icon name="qr-code-outline" slot="start"></ion-icon>
+      Scan QR Code
+    </ion-button>
+  </div>
+
+  <!-- Search Results -->
+  <div class="search-content" *ngIf="hasSearched">
+    <!-- Loading State -->
+    <div class="loading-container" *ngIf="isSearching">
+      <ion-spinner name="crescent"></ion-spinner>
+      <ion-text color="medium">Searching...</ion-text>
+    </div>
+
+    <!-- Results -->
+    <div class="results-container" *ngIf="!isSearching">
+      <ion-text color="medium" class="results-header">
+        <p>{{ searchResults.length }} result(s) found for "{{ searchTerm }}"</p>
+      </ion-text>
+
+      <!-- No Results -->
+      <div class="no-results" *ngIf="searchResults.length === 0">
+        <ion-icon name="search-outline" color="medium" size="large"></ion-icon>
+        <ion-text color="medium">
+          <h3>No boxes found</h3>
+          <p>Try adjusting your search terms or create a new box.</p>
+        </ion-text>
+      </div>
+
+      <!-- Results List -->
+      <ion-list *ngIf="searchResults.length > 0">
+        <ion-item
+          *ngFor="let box of searchResults"
+          [routerLink]="['/tabs/home/box', box.id]"
+          button
+        >
+          <ion-thumbnail slot="start" *ngIf="box.imageUrl">
+            <img [src]="box.imageUrl" [alt]="box.name" />
+          </ion-thumbnail>
+          <ion-icon
+            name="cube-outline"
+            slot="start"
+            color="primary"
+            size="large"
+            *ngIf="!box.imageUrl"
+          >
+          </ion-icon>
+
+          <ion-label>
+            <h3>{{ box.name }}</h3>
+            <p *ngIf="box.description">{{ box.description }}</p>
+
+            <!-- Show general items info when no specific matches -->
+            <div
+              *ngIf="box.items && box.items.length > 0 && !hasMatchingItems(box)"
+              class="items-info"
+            >
+              <ion-note color="primary">
+                {{ box.items.length }} item(s):
+                <span *ngFor="let item of box.items.slice(0, 3); let i = index">
+                  {{ item.name }}<span
+                    *ngIf="i < box.items.slice(0, 3).length - 1"
+                    >,
+                  </span>
+                </span>
+                <span *ngIf="box.items.length > 3">...</span>
+              </ion-note>
+            </div>
+
+            <!-- Show matching items -->
+            <div *ngIf="hasMatchingItems(box)" class="matching-items">
+              <ion-note color="success">
+                <ion-icon name="checkmark-circle" size="small"></ion-icon>
+                Found in items:
+                <span *ngFor="let item of getMatchingItems(box); let i = index">
+                  <strong>{{ item.name }}</strong>
+                  <span *ngIf="item.quantity && item.quantity > 1">
+                    ({{ item.quantity }})</span
+                  >
+                  <span *ngIf="item.isFragile">
+                    <ion-icon
+                      name="warning"
+                      size="small"
+                      color="warning"
+                    ></ion-icon>
+                  </span>
+                  <span *ngIf="i < getMatchingItems(box).length - 1">, </span>
+                </span>
+              </ion-note>
+            </div>
+
+            <ion-note color="medium">
+              Created: {{ box.createdAt | date:'short' }}
+            </ion-note>
+          </ion-label>
+
+          <ion-button
+            fill="clear"
+            slot="end"
+            (click)="$event.stopPropagation()"
+          >
+            <ion-icon name="qr-code-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+
+  <!-- Initial State -->
+  <div class="empty-state" *ngIf="!hasSearched">
+    <ion-icon name="search-outline" color="medium" size="large"></ion-icon>
+    <ion-text color="medium">
+      <h3>Search Your Boxes</h3>
+      <p>
+        Search by box name, description, or item contents. You can also scan a
+        QR code to find your items quickly.
+      </p>
+    </ion-text>
+  </div>
+</ion-content>

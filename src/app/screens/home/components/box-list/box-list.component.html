@@ -1,0 +1,134 @@
+<ion-content>
+  <!-- Empty State -->
+  <div *ngIf="boxes.length === 0" class="empty-state">
+    <ion-icon name="cube-outline" class="empty-icon"></ion-icon>
+    <h2>No Boxes Yet</h2>
+    <p>Create your first box to start organizing your items</p>
+    <ion-button fill="solid" color="primary" (click)="openCreateModal()">
+      <ion-icon name="add" slot="start"></ion-icon>
+      CREATE BOX
+    </ion-button>
+  </div>
+
+  <!-- Barra de herramientas de selección múltiple -->
+  <div *ngIf="isSelectionMode" class="selection-toolbar">
+    <div class="selection-count">
+      <span>{{ selectedBoxes.length }} selected</span>
+    </div>
+    <div class="selection-actions">
+      <ion-button color="primary" (click)="printMultipleQRs()">
+        <ion-icon name="qr-code" slot="start"></ion-icon>
+        Print QR
+      </ion-button>
+      <ion-button color="medium" (click)="exitSelectionMode()">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <ion-list *ngIf="boxes.length > 0">
+    <ion-card
+      *ngFor="let box of boxes; let index"
+      class="card"
+      [class.selected]="isBoxSelected(box)"
+      (click)="onBoxSelected(box)"
+      (press)="onLongPress(box, $event)"
+      (contextmenu)="onLongPress(box, $event)"
+    >
+      <div
+        class="top-section"
+        [ngStyle]="
+          box.imageUrl
+            ? {
+                'background-image': 'url(' + box.imageUrl + ')',
+                'background-size': 'cover',
+                'background-position': 'center'
+              }
+            : {}
+        "
+      >
+        <!-- Indicador de selección -->
+        <div *ngIf="isSelectionMode" class="selection-indicator">
+          <ion-icon
+            [name]="isBoxSelected(box) ? 'checkmark-circle' : 'ellipse-outline'"
+            [color]="isBoxSelected(box) ? 'success' : 'medium'"
+          >
+          </ion-icon>
+        </div>
+        <div class="border"></div>
+        <div class="icons">
+          <div class="logo" title="{{ box.name }}">
+            <span class="ellipsis-text">{{ box.name }}</span>
+          </div>
+          <div class="actions">
+            <ion-button
+              color="danger"
+              size="small"
+              (click)="onDelete(box, $event)"
+            >
+              <ion-icon
+                color="light"
+                slot="icon-only"
+                name="trash-outline"
+              ></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-section">
+        <span class="title" title="{{ box.description }}">{{
+          box.description
+        }}</span>
+        <!-- Checklist badge if assigned -->
+        <div *ngIf="hasChecklist(box)" class="checklist-badge">
+          <ion-icon name="checkbox-outline"></ion-icon>
+          <span>{{ getChecklistName(box) }}</span>
+        </div>
+        <!-- Item properties indicators -->
+        <div class="item-properties" *ngIf="getItemCount(box) > 0">
+          <ion-chip *ngIf="hasFragileItems(box)" color="warning" size="small">
+            <ion-icon name="warning-outline"></ion-icon>
+            <ion-label>Fragile</ion-label>
+          </ion-chip>
+          <ion-chip *ngIf="hasExpiringItems(box)" color="danger" size="small">
+            <ion-icon name="calendar-outline"></ion-icon>
+            <ion-label>Expiring</ion-label>
+          </ion-chip>
+          <ion-chip
+            *ngIf="hasItemsWithImages(box)"
+            color="primary"
+            size="small"
+          >
+            <ion-icon name="image-outline"></ion-icon>
+            <ion-label>Photos</ion-label>
+          </ion-chip>
+        </div>
+
+        <div class="row row1">
+          <div class="item">
+            <span class="big-text">{{ getItemCount(box) }}</span>
+            <span class="regular-text">Items</span>
+          </div>
+          <div class="item">
+            <!-- QR ICON -->
+            <ion-button fill="clear" (click)="onQrSelected(box, $event)">
+              <ion-icon slot="icon-only" name="qr-code-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <div class="item">
+            <span class="big-text">{{
+              box.createdAt | date : "dd/MM/yyyy"
+            }}</span>
+            <span class="regular-text">Created at</span>
+          </div>
+        </div>
+      </div>
+    </ion-card>
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
+    <ion-infinite-scroll-content
+      loadingText="Please wait..."
+      loadingSpinner="bubbles"
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

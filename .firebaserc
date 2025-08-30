@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "qrganize-auth": {
+      "hosting": {
+        "app": [
+          "qrganize-auth"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "qrganize-auth"
+  }
+}

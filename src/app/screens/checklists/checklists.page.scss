@@ -1,0 +1,195 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 400px;
+  height: 70vh;
+
+  .empty-icon {
+    font-size: 80px;
+    color: var(--ion-color-medium);
+    margin-bottom: 20px;
+  }
+
+  h2 {
+    color: var(--ion-color-light);
+    margin-bottom: 10px;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin-bottom: 30px;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+
+  ion-button {
+    --border-radius: 8px;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+}
+
+.checklists-container {
+  padding: 16px;
+}
+
+.checklist-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  ion-card-header {
+    padding-bottom: 8px;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      ion-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #ffffff;
+        flex: 1;
+        margin: 0;
+        margin-right: 12px;
+      }
+
+      .box-chip {
+        flex-shrink: 0;
+
+        ion-chip {
+          margin: 0;
+          font-size: 12px;
+          height: 28px;
+        }
+      }
+    }
+
+    ion-card-subtitle {
+      font-size: 14px;
+      color: var(--ion-color-medium);
+      margin-top: 4px;
+    }
+  }
+
+  ion-card-content {
+    padding-top: 8px;
+  }
+}
+
+.progress-info {
+  margin-bottom: 20px;
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .progress-text {
+      font-size: 14px;
+      color: #b0b0b0;
+      font-weight: 500;
+    }
+
+    .progress-percentage {
+      font-size: 14px;
+      color: var(--ion-color-primary);
+      font-weight: 600;
+    }
+  }
+
+  ion-progress-bar {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+
+  ion-button {
+    margin: 0;
+    font-size: 12px;
+    height: 32px;
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .checklists-container {
+    padding: 12px;
+  }
+
+  .checklist-card {
+    margin-bottom: 12px;
+  }
+
+  .action-buttons {
+    ion-button {
+      font-size: 11px;
+      height: 30px;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .empty-state {
+    h2 {
+      color: var(--ion-color-light);
+    }
+  }
+
+  .checklist-card {
+    ion-card-header {
+      ion-card-title {
+        color: var(--ion-color-light);
+      }
+    }
+  }
+
+  .progress-info {
+    .progress-header {
+      .progress-text {
+        color: #b0b0b0;
+      }
+    }
+  }
+}

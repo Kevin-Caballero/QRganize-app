@@ -1,0 +1,145 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Settings</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Account Summary -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
+        Account Summary
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row *ngIf="isLoadingStats">
+          <ion-col size="12" class="ion-text-center">
+            <ion-spinner name="circular"></ion-spinner>
+            <p>Loading statistics...</p>
+          </ion-col>
+        </ion-row>
+        <ion-row *ngIf="!isLoadingStats">
+          <ion-col size="4">
+            <div class="stat-box">
+              <ion-icon name="cube-outline"></ion-icon>
+              <div class="stat-count">{{ boxesCount }}</div>
+              <div class="stat-label">Boxes</div>
+            </div>
+          </ion-col>
+          <ion-col size="4">
+            <div class="stat-box">
+              <ion-icon name="list-outline"></ion-icon>
+              <div class="stat-count">{{ checklistsCount }}</div>
+              <div class="stat-label">Checklists</div>
+            </div>
+          </ion-col>
+          <ion-col size="4">
+            <div class="stat-box">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              <div class="stat-count">{{ itemsCount }}</div>
+              <div class="stat-label">Items</div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Appearance -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="color-palette-outline" class="section-icon"></ion-icon>
+        Appearance
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-icon name="text-outline" slot="start"></ion-icon>
+        <ion-label>Font Size</ion-label>
+        <ion-select
+          [(ngModel)]="fontSize"
+          (ionChange)="changeFontSize()"
+          interface="popover"
+        >
+          <ion-select-option value="small">Small</ion-select-option>
+          <ion-select-option value="medium">Medium</ion-select-option>
+          <ion-select-option value="large">Large</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Notifications -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="notifications-outline" class="section-icon"></ion-icon>
+        Notifications
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item>
+        <ion-icon name="alert-circle-outline" slot="start"></ion-icon>
+        <ion-label>Expiration Reminders</ion-label>
+        <ion-toggle
+          [(ngModel)]="expirationReminders"
+          (ionChange)="updateNotificationSettings()"
+        ></ion-toggle>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="time-outline" slot="start"></ion-icon>
+        <ion-label>Reminder Time</ion-label>
+        <ion-select
+          [(ngModel)]="reminderDays"
+          (ionChange)="updateNotificationSettings()"
+          interface="popover"
+        >
+          <ion-select-option value="1">1 day before</ion-select-option>
+          <ion-select-option value="3">3 days before</ion-select-option>
+          <ion-select-option value="7">1 week before</ion-select-option>
+          <ion-select-option value="14">2 weeks before</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- More Options -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="settings-outline" class="section-icon"></ion-icon>
+        More Options
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-item button (click)="showHelp()">
+        <ion-icon name="help-circle-outline" slot="start"></ion-icon>
+        <ion-label>Help & Support</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-icon name="information-circle-outline" slot="start"></ion-icon>
+        <ion-label>Version</ion-label>
+        <ion-note slot="end">{{ appVersion }}</ion-note>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button
+    expand="block"
+    class="logout-button ion-margin-top ion-margin-bottom"
+    (click)="logout()"
+  >
+    <ion-icon name="log-out-outline" slot="start"></ion-icon>
+    LOG OUT
+  </ion-button>
+</ion-content>

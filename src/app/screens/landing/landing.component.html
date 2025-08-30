@@ -1,0 +1,32 @@
+<ion-content fullscreen="true">
+  <div class="container">
+    <div class="top">
+      <h2 class="title">Welcome to QRganize!</h2>
+      <p class="subtitle">
+        QRganize is a simple and easy to use
+        <span class="highlight">QR code</span> based
+        <span class="highlight">BOX</span> organizer.
+      </p>
+    </div>
+
+    <div class="actions">
+      <ion-button (click)="login()">Login</ion-button>
+      <ion-button fill="outline" (click)="register()">Sign up</ion-button>
+    </div>
+
+    <div class="bottom">
+      <h4>Or via social media</h4>
+      <div class="social-login">
+        <ion-button class="twitter">
+          <ion-icon name="logo-twitter"></ion-icon>
+        </ion-button>
+        <ion-button class="facebook">
+          <ion-icon name="logo-facebook"></ion-icon>
+        </ion-button>
+        <ion-button class="google">
+          <ion-icon name="logo-google"></ion-icon>
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-content>

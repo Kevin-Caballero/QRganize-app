@@ -1,0 +1,88 @@
+<ion-content fullscreen="true">
+  <swiper-container
+    #swiper
+    [pagination]="true"
+    (swiperslidechange)="onSlideChange()"
+  >
+    <swiper-slide class="swiper-slide">
+      <div class="slide">
+        <img
+          src="./assets/undraw_delivery_truck_vt6p.svg"
+          alt="Illustration"
+          class="slide-image"
+        />
+        <h2>
+          <ion-label color="primary"><b>Easy</b></ion-label> to Use
+        </h2>
+        <p>
+          Our app simplifies the moving process, helping you organize and manage
+          all your boxes and belongings efficiently.
+        </p>
+      </div>
+    </swiper-slide>
+    <swiper-slide>
+      <img
+        src="./assets/undraw_file_manager_re_ms29.svg"
+        alt="Inventory Illustration"
+        class="slide-image"
+      />
+      <h2>
+        Create
+        <ion-label color="primary"><b>Detailed</b></ion-label> Inventories
+      </h2>
+      <p>
+        Record all items in your boxes, assign labels, and categorize each
+        object to make searching and tracking during the move easier.
+      </p>
+    </swiper-slide>
+    <swiper-slide>
+      <img
+        src="./assets/undraw_mobile_search_jxq5.svg"
+        alt="QR Code Illustration"
+        class="slide-image"
+      />
+      <h2>Label with <ion-label color="primary">QR</ion-label></h2>
+      <p>
+        Use QR codes to label each box. Scan the codes to get an instant list of
+        contents.
+      </p>
+    </swiper-slide>
+    <swiper-slide>
+      <img
+        src="./assets/undraw_package_arrived_63rf.svg"
+        alt="Tracking Illustration"
+        class="slide-image"
+      />
+      <h2>
+        Start Your <ion-label color="primary"><b>Move</b></ion-label>
+      </h2>
+      <p>
+        You are ready to start! Use our app to organize your boxes, label with
+        QR codes, and make your move much easier and more efficient.
+      </p>
+      <ion-button fill="solid" color="primary" (click)="startApp()"
+        >Get Started</ion-button
+      >
+    </swiper-slide>
+  </swiper-container>
+</ion-content>
+<ion-footer>
+  <ion-toolbar>
+    <ion-button fill="clear" color="secondary" (click)="skip()"
+      >Skip</ion-button
+    >
+    <ion-progress-bar
+      type="determinate"
+      [value]="progress"
+      color="primary"
+    ></ion-progress-bar>
+    <ion-button
+      slot="end"
+      fill="clear"
+      color="primary"
+      (click)="next()"
+      [disabled]="!canNext"
+      >Next</ion-button
+    >
+  </ion-toolbar>
+</ion-footer>

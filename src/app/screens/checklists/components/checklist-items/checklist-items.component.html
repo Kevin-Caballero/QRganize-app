@@ -1,0 +1,152 @@
+<div class="checklist-items-container">
+  <!-- Items List -->
+  <div class="items-list" *ngIf="checklist.items && checklist.items.length > 0">
+    <ion-card
+      *ngFor="let item of checklist.items; let i = index"
+      class="item-card"
+      [class.completed]="item.isCompleted"
+      [class.editing]="editingItemIndex === i && !isNewItem(i)"
+      style="background: #222428 !important"
+    >
+      <ion-card-content style="background: #222428 !important">
+        <!-- Editing Mode for EXISTING items -->
+        <div *ngIf="editingItemIndex === i && !isNewItem(i)" class="edit-mode">
+          <app-item-form
+            [initialData]="{
+              name: tempItem.name,
+              quantity: tempItem.quantity || 1,
+              fragile: tempItem.isFragile,
+              expires: tempItem.expires,
+              expirationDate: tempItem.expirationDate?.toISOString()
+            }"
+            saveButtonText="Save"
+            cancelButtonText="Cancel"
+            [showQuantity]="true"
+            [showImage]="true"
+            (save)="onItemFormSave($event)"
+            (cancel)="cancelEdit()"
+          >
+          </app-item-form>
+        </div>
+
+        <!-- View Mode -->
+        <div *ngIf="editingItemIndex !== i || isNewItem(i)" class="view-mode">
+          <!-- Tags en la parte superior -->
+          <div
+            class="item-tags-top"
+            *ngIf="
+              item.isFragile ||
+              (item.expires && item.expirationDate) ||
+              item.imageUrl
+            "
+          >
+            <ion-chip
+              *ngIf="item.isFragile"
+              color="warning"
+              size="small"
+              class="property-chip"
+            >
+              <ion-icon name="warning" size="small"></ion-icon>
+              <ion-label>Fragile</ion-label>
+            </ion-chip>
+            <ion-chip
+              *ngIf="item.expires && item.expirationDate"
+              color="danger"
+              size="small"
+              class="property-chip"
+            >
+              <ion-icon name="time" size="small"></ion-icon>
+              <ion-label>
+                Expires: {{ formatDate(item.expirationDate) }}
+              </ion-label>
+            </ion-chip>
+            <ion-chip
+              *ngIf="item.imageUrl"
+              color="tertiary"
+              size="small"
+              class="property-chip photo-chip"
+              (click)="showItemImage(item)"
+            >
+              <ion-icon name="image" size="small"></ion-icon>
+              <ion-label>Photo</ion-label>
+              <ion-icon name="eye" size="small"></ion-icon>
+            </ion-chip>
+          </div>
+
+          <div class="item-content">
+            <!-- Checkbox -->
+            <ion-checkbox
+              [checked]="item.isCompleted"
+              (ionChange)="toggleItem(item)"
+              class="item-checkbox"
+            >
+            </ion-checkbox>
+
+            <!-- Item Info -->
+            <div class="item-info" (click)="toggleItem(item)">
+              <div class="item-name" [class.strikethrough]="item.isCompleted">
+                {{ item.name }}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="item-actions">
+              <ion-button fill="clear" size="small" (click)="editItem(i)">
+                <ion-icon name="create" slot="icon-only"></ion-icon>
+              </ion-button>
+              <ion-button
+                fill="clear"
+                size="small"
+                color="danger"
+                (click)="deleteItem(item)"
+              >
+                <ion-icon name="trash" slot="icon-only"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    class="empty-state"
+    *ngIf="!checklist.items || checklist.items.length === 0"
+  >
+    <ion-icon name="clipboard-outline" class="empty-icon"></ion-icon>
+    <h3>No Items Yet</h3>
+    <p>Add items to your checklist to get organized</p>
+  </div>
+
+  <!-- Add Item Button -->
+  <div class="add-item-section">
+    <ion-button expand="block" fill="outline" (click)="addItem()">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Add Item
+    </ion-button>
+
+    <!-- Inline Add Form (appears when adding new item) -->
+    <div
+      *ngIf="editingItemIndex !== -1 && isNewItem(editingItemIndex)"
+      class="inline-add-form"
+    >
+      <app-item-form
+        [initialData]="{
+          name: tempItem.name,
+          quantity: tempItem.quantity || 1,
+          fragile: tempItem.isFragile,
+          expires: tempItem.expires,
+          expirationDate: tempItem.expirationDate?.toISOString()
+        }"
+        saveButtonText="Save"
+        cancelButtonText="Cancel"
+        [showQuantity]="true"
+        [showImage]="true"
+        (save)="onItemFormSave($event)"
+        (cancel)="cancelEdit()"
+      >
+      </app-item-form>
+    </div>
+  </div>
+</div>

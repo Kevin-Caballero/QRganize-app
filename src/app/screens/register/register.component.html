@@ -1,0 +1,204 @@
+<ion-content fullscreen="true">
+  <div class="container">
+    <div class="logo-container">
+      <img
+        src="assets/qrganize_icon.png"
+        alt="QRganize Logo"
+        class="logo-image"
+      />
+    </div>
+    <div class="top">
+      <h2 class="title">Register Now</h2>
+      <p class="subtitle">Create your account by filling up the form</p>
+    </div>
+
+    <div class="social-login" *ngIf="socialLoginEnabled">
+      <ion-button
+        expand="block"
+        class="twitter"
+        (click)="socialLogin(LoginType.TWITTER)"
+      >
+        <ion-icon name="logo-twitter"></ion-icon>
+      </ion-button>
+      <ion-button
+        expand="block"
+        class="facebook"
+        (click)="socialLogin(LoginType.FACEBOOK)"
+      >
+        <ion-icon name="logo-facebook"></ion-icon>
+      </ion-button>
+      <ion-button
+        expand="block"
+        class="google"
+        (click)="socialLogin(LoginType.GOOGLE)"
+      >
+        <ion-icon name="logo-google"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="register-form">
+      <form [formGroup]="registerForm">
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Name"
+            formControlName="name"
+            placeholder="John"
+          >
+            <ion-icon slot="start" name="person"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            registerForm.get('name')?.invalid &&
+            registerForm.get('name')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          Name is required.
+        </ion-note>
+
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Lastname"
+            formControlName="lastname"
+            placeholder="Doe"
+          >
+            <ion-icon slot="start" name="person"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            registerForm.get('lastname')?.invalid &&
+            registerForm.get('lastname')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          Lastname is required.
+        </ion-note>
+
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Email"
+            formControlName="email"
+            placeholder="john_doe&#64;gmail.com"
+          >
+            <ion-icon slot="start" name="mail"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            registerForm.get('email')?.invalid &&
+            registerForm.get('email')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          Email is required and must be valid.
+        </ion-note>
+
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Password"
+            formControlName="password"
+            placeholder="* * * * * * * *"
+            [type]="passInputType"
+          >
+            <ion-icon slot="start" name="lock-closed"></ion-icon>
+            <ion-button
+              fill="clear"
+              slot="end"
+              aria-label="Show/hide"
+              (click)="changePassVisibility('password')"
+            >
+              <ion-icon slot="icon-only" name="eye"></ion-icon>
+            </ion-button>
+          </ion-input>
+        </ion-item>
+        <div></div>
+        <ion-note
+          [style.min-height]="'20px'"
+          [style.display]="'block'"
+          [style.visibility]="
+            registerForm.get('password')?.invalid &&
+            registerForm.get('password')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          <ng-container
+            *ngIf="registerForm.get('password')?.errors?.['required']"
+            >Password is required.</ng-container
+          >
+          <ng-container
+            *ngIf="registerForm.get('password')?.errors?.['minlength']"
+            >Password must be at least 8 characters long.</ng-container
+          >
+        </ion-note>
+
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Confirm Password"
+            formControlName="confirmPassword"
+            [type]="confirmPassInputType"
+            placeholder="* * * * * * * *"
+          >
+            <ion-icon slot="start" name="lock-closed"></ion-icon>
+            <ion-button
+              fill="clear"
+              slot="end"
+              aria-label="Show/hide"
+              (click)="changePassVisibility('confirmPassword')"
+            >
+              <ion-icon slot="icon-only" name="eye"></ion-icon>
+            </ion-button>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.min-height]="'20px'"
+          [style.display]="'block'"
+          [style.visibility]="
+            registerForm.get('confirmPassword')?.invalid &&
+            registerForm.get('confirmPassword')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          <ng-container
+            *ngIf="registerForm.get('confirmPassword')?.errors?.['required']"
+            >Confirm Password is required.</ng-container
+          >
+          <ng-container
+            *ngIf="registerForm.get('confirmPassword')?.errors?.['minlength']"
+            >Password must be at least 8 characters long.</ng-container
+          >
+          <ng-container
+            *ngIf="registerForm.get('confirmPassword')?.errors?.['passwordMismatch']"
+            >Passwords must match.</ng-container
+          >
+        </ion-note>
+      </form>
+    </div>
+
+    <div class="bottom">
+      <ion-button
+        class="regsiter"
+        (click)="register()"
+        [disabled]="registerForm.invalid"
+        >Register</ion-button
+      >
+      <p>Already have an account? <a (click)="navigateToLogin()">Login</a></p>
+    </div>
+  </div>
+</ion-content>

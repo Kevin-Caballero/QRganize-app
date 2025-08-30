@@ -1,0 +1,196 @@
+.item-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; // Reducir el espacio entre elementos
+
+  // Estilos para inputs
+  .name-item,
+  .quantity-item {
+    --background: #222428;
+    --border-color: #3a4556;
+    --border-style: solid;
+    --border-width: 1px;
+    --border-radius: 8px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --min-height: 44px;
+    margin-bottom: 4px;
+
+    ion-input {
+      --color: #ffffff;
+      --placeholder-color: #8c9eff;
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    ion-label {
+      color: #8c9eff;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+
+    ion-icon {
+      color: #8c9eff;
+      margin-right: 8px;
+    }
+  }
+
+  // Estilos para el selector de fechas
+  ion-modal.date-picker-modal {
+    --border-radius: 16px;
+    --height: auto;
+    --width: 90%;
+    --max-width: 350px;
+
+    ion-content.calendar-content {
+      --padding-start: 0;
+      --padding-end: 0;
+      --padding-top: 10px;
+      --padding-bottom: 10px;
+
+      .centered-calendar {
+        margin: 0 auto;
+      }
+
+      ::ng-deep {
+        .calendar-body {
+          display: flex;
+          justify-content: center;
+        }
+      }
+    }
+
+    ion-datetime {
+      --background: var(--ion-color-step-100);
+      --wheel-highlight-background: var(--ion-color-primary-tint);
+      --wheel-highlight-text-color: var(--ion-color-primary-contrast);
+      --wheel-item-text-color: var(--ion-color-step-650);
+      --wheel-item-font-size: 16px;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      --calendar-width: 100%;
+
+      ::ng-deep {
+        .calendar-body,
+        .calendar-month,
+        .calendar-day-of-week,
+        .calendar-month-grid {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
+
+        .calendar-day {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .calendar-header {
+          text-align: center;
+        }
+      }
+    }
+
+    ion-toolbar {
+      --background: var(--ion-color-step-50);
+
+      ion-title {
+        font-size: 18px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      ion-button {
+        font-weight: 500;
+      }
+    }
+  }
+
+  // Property tags
+  .property-tags {
+    display: flex;
+    gap: 6px;
+    justify-content: space-between;
+
+    .property-tag {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      background: #2a3142;
+      color: #8c9eff;
+      border: 1px solid #3a4556;
+      border-radius: 16px;
+      cursor: pointer;
+      flex: 1;
+      height: 36px;
+      font-size: 13px;
+
+      &.fragile-tag.active {
+        background: rgba(var(--ion-color-warning-rgb), 0.2);
+        color: var(--ion-color-warning);
+        border-color: var(--ion-color-warning);
+
+        ion-icon {
+          color: var(--ion-color-warning);
+        }
+      }
+
+      &.expires-tag.active {
+        background: rgba(var(--ion-color-danger-rgb), 0.2);
+        color: var(--ion-color-danger);
+        border-color: var(--ion-color-danger);
+
+        ion-icon {
+          color: var(--ion-color-danger);
+        }
+      }
+
+      &.image-tag.active {
+        background: rgba(var(--ion-color-primary-rgb), 0.2);
+        color: var(--ion-color-primary);
+        border-color: var(--ion-color-primary);
+
+        ion-icon {
+          color: var(--ion-color-primary);
+        }
+      }
+
+      ion-icon {
+        font-size: 14px;
+        margin-right: 4px;
+      }
+
+      span {
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  // Action buttons
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+    position: relative;
+    z-index: 100; // Asegurar que siempre estén visibles
+
+    ion-button {
+      --border-radius: 4px;
+      font-weight: 500;
+      height: 36px;
+
+      &[color="medium"] {
+        --color: #8c9eff;
+      }
+    }
+  }
+}

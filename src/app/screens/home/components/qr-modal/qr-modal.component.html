@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      {{ isMultiple ? "Multiple QR Codes" : "QR Preview" }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="printQr()">Print</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="qr-container" *ngFor="let item of multipleQrCodes">
+    <div class="qr-name">{{ item.name }}</div>
+    <img [src]="item.qrCode" alt="QR Code" />
+  </div>
+</ion-content>

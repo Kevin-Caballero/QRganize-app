@@ -1,0 +1,127 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Checklists</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openCreateModal()">
+        <ion-icon name="add-circle-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Checklists</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading">
+    <!-- Empty State -->
+    <div *ngIf="checklists.length === 0" class="empty-state">
+      <ion-icon name="checkbox-outline" class="empty-icon"></ion-icon>
+      <h2>No Checklists Yet</h2>
+      <p>Create your first checklist to organize items for your boxes</p>
+      <ion-button fill="solid" color="primary" (click)="openCreateModal()">
+        <ion-icon name="add" slot="start"></ion-icon>
+        CREATE CHECKLIST
+      </ion-button>
+    </div>
+
+    <!-- Checklists List -->
+    <div *ngIf="checklists.length > 0" class="checklists-container">
+      <ion-card
+        *ngFor="let checklist of checklists"
+        class="checklist-card"
+        (click)="openChecklistDetail(checklist)"
+      >
+        <ion-card-header>
+          <div class="header-content">
+            <ion-card-title>{{ checklist.name }}</ion-card-title>
+            <!-- Box Assignment Info in header -->
+            <div class="box-chip">
+              <ion-chip color="secondary" *ngIf="checklist.boxId">
+                <ion-icon name="cube" slot="start"></ion-icon>
+                <ion-label>{{ getBoxName(checklist.boxId) }}</ion-label>
+              </ion-chip>
+              <ion-chip color="medium" *ngIf="!checklist.boxId">
+                <ion-icon name="cube-outline" slot="start"></ion-icon>
+                <ion-label>Not assigned</ion-label>
+              </ion-chip>
+            </div>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <!-- Progress Info -->
+          <div class="progress-info">
+            <div class="progress-header">
+              <span class="progress-text">
+                {{ getCompletedItemsCount(checklist) }} of {{
+                checklist.items?.length || 0 }} items completed
+              </span>
+              <span class="progress-percentage"
+                >{{ getCompletionPercentage(checklist) }}%</span
+              >
+            </div>
+            <ion-progress-bar
+              [value]="getCompletionPercentage(checklist) / 100"
+              [color]="getCompletionPercentage(checklist) === 100 ? 'success' : 'primary'"
+            >
+            </ion-progress-bar>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons" (click)="$event.stopPropagation()">
+            <ion-button
+              fill="clear"
+              size="small"
+              (click)="openEditModal(checklist)"
+            >
+              <ion-icon name="create" slot="start"></ion-icon>
+              Edit
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              color="medium"
+              *ngIf="!checklist.boxId"
+              (click)="assignToBox(checklist)"
+            >
+              <ion-icon name="link" slot="start"></ion-icon>
+              Assign to Box
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              color="medium"
+              *ngIf="checklist.boxId"
+              (click)="unassignFromBox(checklist)"
+            >
+              <ion-icon name="unlink" slot="start"></ion-icon>
+              Unassign
+            </ion-button>
+
+            <ion-button
+              fill="clear"
+              size="small"
+              color="danger"
+              (click)="deleteChecklist(checklist)"
+            >
+              <ion-icon name="trash" slot="start"></ion-icon>
+              Delete
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+</ion-content>

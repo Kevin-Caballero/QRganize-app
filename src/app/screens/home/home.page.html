@@ -1,0 +1,15 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Boxes</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="onAdd()">
+        <ion-icon name="add-circle-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" style="background: rgb(30, 30, 30)">
+  <app-box-list></app-box-list>
+</ion-content>
