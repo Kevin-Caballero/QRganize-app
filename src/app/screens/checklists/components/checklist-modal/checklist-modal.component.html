@@ -1,6 +1,18 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button color="medium" (click)="dismiss()"> CANCEL </ion-button>
+    </ion-buttons>
     <ion-title>New Checklist</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="save()"
+        [disabled]="!checklistName?.trim() || loading"
+        [strong]="true"
+      >
+        SAVE
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -201,18 +213,3 @@
     </div>
   </div>
 </ion-content>
-
-<ion-footer>
-  <div class="footer-actions">
-    <ion-button color="medium" fill="clear" (click)="dismiss()">
-      CANCEL
-    </ion-button>
-    <ion-button
-      (click)="save()"
-      [disabled]="!checklistName?.trim() || loading"
-      [strong]="true"
-    >
-      SAVE
-    </ion-button>
-  </div>
-</ion-footer>
