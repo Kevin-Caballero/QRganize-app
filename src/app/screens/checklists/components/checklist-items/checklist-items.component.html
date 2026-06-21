@@ -66,11 +66,13 @@
             </ion-button>
             <ion-button
               *ngIf="tempImageUri"
-              fill="clear"
+              fill="outline"
               size="small"
               color="danger"
+              class="remove-photo-button"
               (click)="removeImage()"
             >
+              <ion-icon name="trash-outline" slot="start"></ion-icon>
               Remove
             </ion-button>
           </div>
@@ -87,8 +89,17 @@
           <!-- Tags -->
           <div
             class="item-tags-top"
-            *ngIf="item.isFragile || (item.expires && item.expirationDate) || item.imageUri"
+            *ngIf="item.isFragile || (item.expires && item.expirationDate) || item.imageUri || item.linkedItemId"
           >
+            <ion-chip
+              *ngIf="item.linkedItemId"
+              color="success"
+              size="small"
+              class="property-chip linked-item-chip"
+            >
+              <ion-icon name="checkmark-done" size="small"></ion-icon>
+              <ion-label class="app-text-mono">Added to box</ion-label>
+            </ion-chip>
             <ion-chip
               *ngIf="item.isFragile"
               color="warning"
@@ -247,11 +258,13 @@
         </ion-button>
         <ion-button
           *ngIf="tempImageUri"
-          fill="clear"
+          fill="outline"
           size="small"
           color="danger"
+          class="remove-photo-button"
           (click)="removeImage()"
         >
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
           Remove
         </ion-button>
       </div>

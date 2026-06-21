@@ -534,6 +534,25 @@ describe('ChecklistSqliteRepository', () => {
     expect(updated.createdAt).toBe(created.createdAt);
   });
 
+  it('round-trips linkedItemId via updateItem and findItemsByChecklistId (Spec 018)', async () => {
+    const created = await repository.createItem(
+      makeItem(checklistId, { title: 'Pack books' }),
+      UID
+    );
+    expect(created.linkedItemId).toBeUndefined();
+
+    const updated = await repository.updateItem(
+      created.id,
+      { linkedItemId: 'some-box-item-id' },
+      UID
+    );
+    expect(updated.linkedItemId).toBe('some-box-item-id');
+
+    const items = await repository.findItemsByChecklistId(checklistId, UID);
+    const refetched = items.find((item) => item.id === created.id);
+    expect(refetched?.linkedItemId).toBe('some-box-item-id');
+  });
+
   it('rejects createItem with an empty/whitespace-only title', async () => {
     await expectAsync(
       repository.createItem(makeItem(checklistId, { title: '' }), UID)

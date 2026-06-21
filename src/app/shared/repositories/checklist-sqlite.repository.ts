@@ -38,6 +38,7 @@ interface ChecklistItemRow {
   expires: number | null;
   expiration_date: string | null;
   image_uri: string | null;
+  linked_item_id: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
@@ -80,6 +81,9 @@ function rowToLocalChecklistItem(row: ChecklistItemRow): LocalChecklistItem {
   }
   if (row.image_uri !== null && row.image_uri !== undefined) {
     item.imageUri = row.image_uri;
+  }
+  if (row.linked_item_id !== null && row.linked_item_id !== undefined) {
+    item.linkedItemId = row.linked_item_id;
   }
   if (row.deleted_at !== null && row.deleted_at !== undefined) {
     item.deletedAt = row.deleted_at;
@@ -291,14 +295,17 @@ export class ChecklistSqliteRepository implements ChecklistRepository {
     if (item.imageUri !== undefined) {
       toInsert.imageUri = item.imageUri;
     }
+    if (item.linkedItemId !== undefined) {
+      toInsert.linkedItemId = item.linkedItemId;
+    }
     if (item.deletedAt !== undefined) {
       toInsert.deletedAt = item.deletedAt;
     }
 
     await this.sqlite.execute(
       `INSERT INTO checklist_items (
-        id, checklist_id, title, notes, is_completed, sort_order, quantity, is_fragile, expires, expiration_date, image_uri, created_at, updated_at, deleted_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+        id, checklist_id, title, notes, is_completed, sort_order, quantity, is_fragile, expires, expiration_date, image_uri, linked_item_id, created_at, updated_at, deleted_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
       [
         toInsert.id,
         toInsert.checklistId,
@@ -311,6 +318,7 @@ export class ChecklistSqliteRepository implements ChecklistRepository {
         toInsert.expires ? 1 : 0,
         toInsert.expirationDate ?? null,
         toInsert.imageUri ?? null,
+        toInsert.linkedItemId ?? null,
         toInsert.createdAt,
         toInsert.updatedAt,
         toInsert.deletedAt ?? null,
@@ -387,6 +395,7 @@ export class ChecklistSqliteRepository implements ChecklistRepository {
         expires = ?,
         expiration_date = ?,
         image_uri = ?,
+        linked_item_id = ?,
         updated_at = ?,
         deleted_at = ?
       WHERE id = ? AND checklist_id IN (
@@ -402,6 +411,7 @@ export class ChecklistSqliteRepository implements ChecklistRepository {
         updated.expires ? 1 : 0,
         updated.expirationDate ?? null,
         updated.imageUri ?? null,
+        updated.linkedItemId ?? null,
         updated.updatedAt,
         updated.deletedAt ?? null,
         updated.id,

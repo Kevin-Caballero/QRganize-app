@@ -26,6 +26,7 @@ export interface LocalChecklistItem {
   expires?: boolean; // see Spec 002 Addendum 2
   expirationDate?: string; // ISO 8601, see Spec 002 Addendum 2
   imageUri?: string; // local file URI, see Spec 002 Addendum 2
+  linkedItemId?: string; // references LocalItem.id, see Spec 018; set once on first box-item creation, never cleared by Spec 018's own logic
   createdAt: string; // ISO 8601
   updatedAt: string; // ISO 8601
   deletedAt?: string; // ISO 8601, present only when soft-deleted

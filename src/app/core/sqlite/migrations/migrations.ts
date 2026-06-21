@@ -8,6 +8,7 @@ import { migration006ItemExtraFields } from './006_item_extra_fields';
 import { migration007ChecklistExtraFields } from './007_checklist_extra_fields';
 import { migration008BoxPackingStatus } from './008_box_packing_status';
 import { migration009UserScoping } from './009_user_scoping';
+import { migration010ChecklistItemLinkedItem } from './010_checklist_item_linked_item';
 
 /**
  * Append-only, ascending list of all migrations known to the app.
@@ -24,4 +25,5 @@ export const migrations: Migration[] = [
   migration007ChecklistExtraFields,
   migration008BoxPackingStatus,
   migration009UserScoping,
+  migration010ChecklistItemLinkedItem,
 ];

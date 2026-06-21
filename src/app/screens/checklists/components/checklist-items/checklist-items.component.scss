@@ -5,6 +5,7 @@
 .image-section {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 8px 0;
 
@@ -13,6 +14,19 @@
     height: 48px;
     border-radius: 8px;
     object-fit: cover;
+  }
+
+  // Ionic buttons carry their own default margin, which on top of the
+  // flex `gap` above made "Remove" read as a disconnected, far-floating
+  // bit of plain text (it was also `fill="clear"`, i.e. no border) next
+  // to the bordered "Change Photo" button. Zeroing the margin and giving
+  // it the same outline weight keeps both reading as one button group.
+  ion-button {
+    margin: 0;
+  }
+
+  .remove-photo-button {
+    --border-width: 1px;
   }
 }
 

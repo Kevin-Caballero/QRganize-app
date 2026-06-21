@@ -1,9 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { ModalController, Platform } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { firstValueFrom } from 'rxjs';
 import { LocalChecklistsService } from '../../../../shared/services/local-checklists.service';
 import { LocalChecklistItem } from '../../../../shared/models/local-checklist';
 import { ImageModalComponent } from '../../../../components/image-modal/image-modal.component';
+import { ItemService } from '../../../home/services/item.service';
+import { CreateItemDto } from '../../../home/models/item.interface';
 
 /**
  * Checklist items list/editor for a single checklist. Per docs/specs.md
@@ -23,6 +26,7 @@ import { ImageModalComponent } from '../../../../components/image-modal/image-mo
 })
 export class ChecklistItemsComponent {
   @Input() checklistId!: string;
+  @Input() boxId?: string;
   @Input() items: LocalChecklistItem[] = [];
   @Output() checklistUpdated = new EventEmitter<void>();
 
@@ -37,6 +41,7 @@ export class ChecklistItemsComponent {
 
   constructor(
     private localChecklistsService: LocalChecklistsService,
+    private itemService: ItemService,
     private modalController: ModalController,
     private platform: Platform
   ) {}
@@ -191,8 +196,59 @@ export class ChecklistItemsComponent {
 
       this.items[index] = updatedItem;
       this.checklistUpdated.emit();
+
+      if (this.boxId && newCompletionState && !updatedItem.linkedItemId) {
+        await this.createLinkedBoxItem(index, updatedItem);
+      }
     } catch (error) {
       console.error('Error toggling checklist item:', error);
+    }
+  }
+
+  /**
+   * Per docs/specs.md Spec 018: when a checklist item belonging to a
+   * box-linked checklist is checked for the first time (no `linkedItemId`
+   * yet), creates the corresponding `LocalItem` in the linked box via
+   * `ItemService.createItem` (so Spec 017 expiration-notification
+   * scheduling fires normally), then persists the resulting id back onto
+   * the checklist item as `linkedItemId`. Failures here are logged but must
+   * not roll back or block the checklist item's own checked state, which
+   * has already been committed by the caller.
+   */
+  private async createLinkedBoxItem(
+    index: number,
+    item: LocalChecklistItem
+  ): Promise<void> {
+    if (!this.boxId) {
+      return;
+    }
+
+    try {
+      const dto: CreateItemDto = {
+        name: item.title,
+        description: item.notes,
+        quantity: item.quantity,
+        isFragile: item.isFragile,
+        expires: item.expires,
+        expirationDate:
+          item.expires && item.expirationDate
+            ? new Date(item.expirationDate)
+            : undefined,
+        image: item.imageUri,
+      };
+
+      const createdItem = await firstValueFrom(
+        this.itemService.createItem(this.boxId, dto)
+      );
+
+      const updatedItem = await this.localChecklistsService.updateChecklistItem(
+        item.id,
+        { linkedItemId: createdItem.id }
+      );
+
+      this.items[index] = updatedItem;
+    } catch (error) {
+      console.error('Error creating linked box item:', error);
     }
   }
 
