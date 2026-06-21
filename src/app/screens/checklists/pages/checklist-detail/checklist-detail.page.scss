@@ -1,35 +1,12 @@
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-}
-
-// Force dark background for all cards in this page
-ion-card {
-  background: #222428 !important;
-
-  ion-card-header {
-    background: #222428 !important;
-  }
-
-  ion-card-content {
-    background: #222428 !important;
-  }
-}
 .checklist-header {
   padding: 16px;
   padding-bottom: 0;
 
   .checklist-card {
     margin: 0;
-    background: #222428 !important;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
     ion-card-header {
       padding-bottom: 8px;
-      background: #222428 !important;
 
       .header-content {
         display: flex;
@@ -39,7 +16,6 @@ ion-card {
         ion-card-title {
           font-size: 20px;
           font-weight: 600;
-          color: #ffffff !important;
           flex: 1;
           margin: 0;
           margin-right: 12px;
@@ -66,7 +42,6 @@ ion-card {
 
     ion-card-content {
       padding-top: 8px;
-      background: #222428 !important;
     }
   }
 }
@@ -82,7 +57,7 @@ ion-card {
 
     .progress-text {
       font-size: 14px;
-      color: #b0b0b0;
+      color: var(--app-empty-state-color);
       font-weight: 500;
     }
 
@@ -125,36 +100,6 @@ ion-card {
 
 .checklist-items-section {
   padding: 0 16px 16px;
-}
-
-.error-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-  min-height: 400px;
-
-  .error-icon {
-    font-size: 80px;
-    color: var(--ion-color-warning);
-    margin-bottom: 20px;
-  }
-
-  h2 {
-    color: var(--ion-color-dark);
-    margin-bottom: 10px;
-    font-size: 24px;
-    font-weight: 600;
-  }
-
-  p {
-    color: var(--ion-color-medium);
-    margin-bottom: 30px;
-    max-width: 300px;
-    line-height: 1.5;
-  }
 }
 
 // Responsive design
@@ -204,37 +149,11 @@ ion-card {
 
 // Dark mode support
 @media (prefers-color-scheme: dark) {
-  .checklist-header {
-    .checklist-card {
-      background: var(--ion-color-dark) !important;
-
-      ion-card-header {
-        background: var(--ion-color-dark) !important;
-
-        .header-content {
-          ion-card-title {
-            color: #ffffff !important;
-          }
-        }
-      }
-
-      ion-card-content {
-        background: var(--ion-color-dark) !important;
-      }
-    }
-  }
-
   .progress-info {
     .progress-header {
       .progress-text {
-        color: #b0b0b0 !important;
+        color: var(--app-empty-state-color) !important;
       }
-    }
-  }
-
-  .error-state {
-    h2 {
-      color: var(--ion-color-light);
     }
   }
 }

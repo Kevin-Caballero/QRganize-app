@@ -1,4 +1,4 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="app-page">
   <div class="container">
     <div class="logo-container">
       <img
@@ -8,36 +8,22 @@
       />
     </div>
     <div class="top">
-      <h2 class="title">Login Now</h2>
-      <p class="subtitle">Please login to continue using the app.</p>
+      <h2 class="title app-text-h1">Login Now</h2>
+      <p class="subtitle app-text-body">Please login to continue using the app.</p>
     </div>
 
-    <div class="social-login" *ngIf="socialLoginEnabled">
+    <div class="social-login">
       <ion-button
         expand="block"
-        class="twitter"
-        (click)="socialLogin(LoginType.TWITTER)"
+        class="google app-primary-action"
+        [disabled]="isSubmitting"
+        (click)="loginWithGoogle()"
       >
-        <ion-icon name="logo-twitter"></ion-icon>
-      </ion-button>
-      <ion-button
-        expand="block"
-        class="facebook"
-        (click)="socialLogin(LoginType.FACEBOOK)"
-      >
-        <ion-icon name="logo-facebook"></ion-icon>
-      </ion-button>
-      <ion-button
-        expand="block"
-        class="google"
-        (click)="socialLogin(LoginType.GOOGLE)"
-      >
-        <ion-icon name="logo-google"></ion-icon>
+        <ion-icon slot="start" name="logo-google"></ion-icon>
+        Continue with Google
       </ion-button>
     </div>
-    <p class="or-login-with-email" *ngIf="socialLoginEnabled">
-      Or login with email
-    </p>
+    <p class="or-login-with-email app-text-caption">Or sign in with email</p>
 
     <div class="login-form">
       <form [formGroup]="loginForm">
@@ -52,10 +38,9 @@
           </ion-input>
         </ion-item>
         <ion-note
-          [style.visibility]="
-            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
-              ? 'visible'
-              : 'hidden'
+          class="app-text-caption"
+          [class.error-note--hidden]="
+            !(loginForm.get('email')?.invalid && loginForm.get('email')?.touched)
           "
           color="danger"
         >
@@ -82,11 +67,10 @@
           </ion-input>
         </ion-item>
         <ion-note
-          [style.visibility]="
-            loginForm.get('password')?.invalid &&
-            loginForm.get('password')?.touched
-              ? 'visible'
-              : 'hidden'
+          class="app-text-caption"
+          [class.error-note--hidden]="
+            !(loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched)
           "
           color="danger"
         >
@@ -95,26 +79,26 @@
 
         <div class="remember-me">
           <ion-button
-            *ngIf="resetPasswordAvailable"
             fill="clear"
-            style="margin: 0"
             class="forgot-password-btn"
             (click)="forgotPassword()"
             >Forgot password?</ion-button
-          >
-          <div *ngIf="!resetPasswordAvailable" style="width: 100%"></div>
-          <ion-checkbox labelPlacement="end" formControlName="rememberMe"
-            >Remember me</ion-checkbox
           >
         </div>
       </form>
     </div>
 
     <div class="bottom">
-      <ion-button class="login" [disabled]="loginForm.invalid" (click)="login()"
-        >Login</ion-button
+      <ion-button
+        class="login app-primary-action"
+        [disabled]="loginForm.invalid || isSubmitting"
+        (click)="login()"
+        >Sign in with email</ion-button
       >
-      <p>Don't have an account? <a (click)="navigateToRegister()">Signup</a></p>
+      <p class="app-text-body">
+        Don't have an account?
+        <a class="secondary-link" (click)="navigateToRegister()">Signup</a>
+      </p>
     </div>
   </div>
 </ion-content>

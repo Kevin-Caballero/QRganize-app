@@ -3,9 +3,14 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ box?.name }}</ion-title>
+    <ion-title class="app-text-h1">{{ box?.name }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="onEditBox()">
+      <ion-button
+        (click)="onEditBox()"
+        class="app-primary-action"
+        fill="clear"
+        aria-label="Edit box"
+      >
         <ion-icon slot="icon-only" name="create-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -13,15 +18,21 @@
 </ion-header>
 <ion-content
   padding
-  style="background: #1b233d"
-  class="ion-padding"
+  class="ion-padding box-detail-content"
   [fullscreen]="true"
   [scrollEvents]="true"
   (ionScroll)="logScrolling($event)"
 >
-  <ion-card>
+  <ion-card class="app-card--labeled">
     <ion-card-header>
-      <ion-card-title>{{ box?.name }}</ion-card-title>
+      <ion-card-title class="app-text-h2">{{ box?.name }}</ion-card-title>
+      <span
+        class="app-badge"
+        [class.app-badge--packing]="getPackingStatus() === 'packing'"
+        [class.app-badge--sealed]="getPackingStatus() === 'sealed'"
+      >
+        {{ getPackingStatus() === 'sealed' ? 'Sealed' : 'Packing' }}
+      </span>
     </ion-card-header>
     <ion-card-content>
       <ion-grid>
@@ -31,13 +42,13 @@
               <ion-label>Box Image</ion-label>
               <ion-note color="primary" slot="end">
                 <img
-                  *ngIf="box.imageUrl; else noImage"
-                  style="border-radius: 50%"
-                  [src]="box.imageUrl"
+                  *ngIf="resolvedBoxImageUrl; else noImage"
+                  class="box-image-thumbnail"
+                  [src]="resolvedBoxImageUrl"
                   alt="box image"
                   width="50px"
                   height="50px"
-                  (click)="onImageClick(box.imageUrl)"
+                  (click)="onImageClick(resolvedBoxImageUrl)"
                 />
                 <ng-template #noImage>
                   <ion-icon name="image-outline"></ion-icon>
@@ -48,7 +59,7 @@
           <ion-col>
             <div class="box">
               <ion-label>Created At</ion-label>
-              <ion-note color="primary" slot="end">{{
+              <ion-note color="primary" slot="end" class="app-text-mono">{{
                 box.createdAt | date : "dd/MM/yyyy"
               }}</ion-note>
             </div>
@@ -78,12 +89,26 @@
                   (click)="viewChecklist()"
                 >
                   <ion-icon name="checkbox-outline"></ion-icon>
-                  <ion-label>{{ assignedChecklist.name }}</ion-label>
+                  <ion-label>{{ assignedChecklist.title }}</ion-label>
                   <ion-icon name="chevron-forward"></ion-icon>
+                  <ion-icon
+                    name="close-circle-outline"
+                    aria-label="Unassign checklist"
+                    (click)="onUnassignChecklist(); $event.stopPropagation()"
+                  ></ion-icon>
                 </ion-chip>
-                <ion-note color="medium" *ngIf="!assignedChecklist"
-                  >No checklist assigned</ion-note
+                <ion-button
+                  *ngIf="!assignedChecklist"
+                  fill="outline"
+                  color="medium"
+                  size="small"
+                  class="assign-checklist-button"
+                  [disabled]="isLoadingAvailableChecklists"
+                  (click)="onAssignChecklist()"
                 >
+                  <ion-icon slot="start" name="checkbox-outline"></ion-icon>
+                  Assign Checklist
+                </ion-button>
               </ng-container>
             </div>
           </ion-col>
@@ -92,21 +117,52 @@
     </ion-card-content>
   </ion-card>
 
-  <ion-card>
-    <ion-button expand="block" color="primary" (click)="onAddItem()">
+  <ion-card class="app-card--labeled">
+    <ion-button
+      *ngIf="getPackingStatus() === 'packing'"
+      expand="block"
+      class="app-primary-action seal-box-button"
+      color="primary"
+      (click)="onSealBox()"
+    >
+      <ion-icon slot="start" name="lock-closed-outline"></ion-icon>
+      Seal Box
+    </ion-button>
+    <ion-button
+      *ngIf="getPackingStatus() === 'sealed'"
+      expand="block"
+      class="reopen-box-button"
+      fill="outline"
+      color="medium"
+      (click)="onReopenBox()"
+    >
+      <ion-icon slot="start" name="lock-open-outline"></ion-icon>
+      Reopen Box
+    </ion-button>
+  </ion-card>
+
+  <ion-card class="app-card--labeled">
+    <ion-button
+      expand="block"
+      class="app-primary-action"
+      color="primary"
+      (click)="onAddItem()"
+    >
       <ion-icon slot="start" name="add-outline"></ion-icon>
       Add Item
     </ion-button>
 
     <!-- Items Summary -->
-    <div class="box" style="margin: 1em 0">
+    <div class="box items-summary">
       <ion-label *ngIf="items.length > 0">
         There
         <ng-container *ngIf="items.length === 1; else plural">
           is
         </ng-container>
         <ng-template #plural> are </ng-template>
-        <ion-note color="primary" slot="end">{{ items?.length }}</ion-note>
+        <ion-note color="primary" slot="end" class="app-text-mono">{{
+          items?.length
+        }}</ion-note>
         item<ng-container *ngIf="items.length > 1">s</ng-container> in this box
       </ion-label>
       <ion-label *ngIf="items.length === 0 && !isLoadingItems">
@@ -122,89 +178,68 @@
 
     <!-- Items List -->
     <ion-list *ngIf="!isLoadingItems">
-      <ion-item *ngFor="let item of items" button>
-        <!-- Item Image or Icon with Quantity -->
-        <div class="icon-container" slot="start">
-          <ng-container *ngIf="getItemImageUrl(item); else defaultIcon">
-            <img
-              [src]="getItemImageUrl(item)"
-              alt="Item image"
-              class="item-image"
-              (click)="onImageClick(getItemImageUrl(item))"
-            />
-          </ng-container>
-          <ng-template #defaultIcon>
-            <ion-icon
-              name="cube-outline"
-              color="primary"
-              size="large"
-            ></ion-icon>
-          </ng-template>
-          <div class="quantity-badge">{{ item.quantity || 1 }}</div>
-        </div>
-
-        <!-- Item Info -->
-        <ion-label>
-          <!-- Item Properties - Ahora arriba -->
-          <div class="item-properties">
-            <!-- Fragile indicator -->
-            <ion-chip *ngIf="item.isFragile" color="warning" size="small">
-              <ion-icon name="warning-outline"></ion-icon>
-              <ion-label>Fragile</ion-label>
-            </ion-chip>
-
-            <!-- Expiration indicator -->
-            <ion-chip
-              *ngIf="item.expires && item.expirationDate"
-              color="danger"
-              size="small"
-            >
-              <ion-icon name="calendar-outline"></ion-icon>
-              <ion-label
-                >Expires:
-                {{ item.expirationDate | date : "M/d/yyyy" }}</ion-label
-              >
-            </ion-chip>
-
-            <!-- Image indicator -->
-            <ion-chip
-              *ngIf="getItemImageUrl(item)"
-              color="tertiary"
-              size="small"
-              (click)="
-                onImageClick(getItemImageUrl(item)); $event.stopPropagation()
-              "
-            >
-              <ion-icon name="image-outline"></ion-icon>
-              <ion-label>Photo</ion-label>
-              <ion-icon name="eye-outline" size="small"></ion-icon>
-            </ion-chip>
+      <ion-item-sliding *ngFor="let item of items">
+        <ion-item button>
+          <!-- Item Image or Icon with Quantity -->
+          <div class="icon-container" slot="start">
+            <ng-container *ngIf="getItemImageUrl(item); else defaultIcon">
+              <img
+                [src]="getItemImageUrl(item)"
+                alt="Item image"
+                class="item-image"
+                (click)="onImageClick(getItemImageUrl(item))"
+              />
+            </ng-container>
+            <ng-template #defaultIcon>
+              <ion-icon
+                name="cube-outline"
+                color="primary"
+                size="large"
+              ></ion-icon>
+            </ng-template>
+            <div class="quantity-badge">{{ item.quantity || 1 }}</div>
           </div>
 
-          <!-- Nombre del item -->
-          <h2>{{ item.name }}</h2>
+          <!-- Item Info -->
+          <ion-label>
+            <!-- Nombre del item -->
+            <h2>{{ item.name }}</h2>
 
-          <ion-note color="medium">
-            Added: {{ item.createdAt | date : "M/d/yyyy, h:mm a" }}
-          </ion-note>
-        </ion-label>
+            <!-- Item Properties: compact inline badges -->
+            <div
+              class="item-properties"
+              *ngIf="item.isFragile || (item.expires && item.expirationDate)"
+            >
+              <span class="property-badge property-badge--warning" *ngIf="item.isFragile">
+                <ion-icon name="warning-outline"></ion-icon>
+                Fragile
+              </span>
 
-        <!-- Item Actions -->
-        <ion-buttons slot="end">
-          <ion-button
-            fill="clear"
-            (click)="onEditItem(item); $event.stopPropagation()"
-          >
-            <ion-icon name="create-outline" color="primary"></ion-icon>
-          </ion-button>
-          <ion-button
-            fill="clear"
-            (click)="onDeleteItem(item); $event.stopPropagation()"
-          >
-            <ion-icon name="trash-outline" color="danger"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-item>
+              <span
+                class="property-badge property-badge--danger"
+                *ngIf="item.expires && item.expirationDate"
+              >
+                <ion-icon name="calendar-outline"></ion-icon>
+                Expires {{ item.expirationDate | date : "M/d/yyyy" }}
+              </span>
+            </div>
+
+            <ion-note color="medium">
+              Added: {{ item.createdAt | date : "M/d/yyyy, h:mm a" }}
+            </ion-note>
+          </ion-label>
+        </ion-item>
+
+        <!-- Item Actions (swipe-to-reveal) -->
+        <ion-item-options side="end">
+          <ion-item-option color="primary" (click)="onEditItem(item)">
+            <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+          </ion-item-option>
+          <ion-item-option color="danger" (click)="onDeleteItem(item)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
     </ion-list>
   </ion-card>
 </ion-content>

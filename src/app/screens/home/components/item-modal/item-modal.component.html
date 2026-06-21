@@ -9,6 +9,7 @@
         (click)="confirm()"
         [disabled]="!itemForm.valid"
         [strong]="true"
+        class="app-primary-action"
       >
         {{ isEditing ? "Update" : "Confirm" }}
       </ion-button>
@@ -16,10 +17,12 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding item-modal-content">
   <div class="container">
     <div class="item-form">
-      <H3>{{ isEditing ? "Edit an" : "Create an" }} <b>Item</b></H3>
+      <h3 class="app-text-h2">
+        {{ isEditing ? "Edit an" : "Create an" }} <b>Item</b>
+      </h3>
       <form [formGroup]="itemForm">
         <ion-item>
           <ion-input
@@ -96,7 +99,7 @@
             Fragile Item
           </ion-checkbox>
         </ion-item>
-        <ion-note style="visibility: hidden">.</ion-note>
+        <ion-note class="hidden-note">.</ion-note>
 
         <ion-item>
           <ion-checkbox
@@ -108,7 +111,7 @@
             Item Expires
           </ion-checkbox>
         </ion-item>
-        <ion-note style="visibility: hidden">.</ion-note>
+        <ion-note class="hidden-note">.</ion-note>
 
         <!-- Calendario para fecha de expiración -->
         <div *ngIf="itemForm.get('expires')?.value" class="expiration-section">

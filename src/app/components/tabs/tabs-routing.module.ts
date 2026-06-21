@@ -41,8 +41,20 @@ const routes: Routes = [
     ],
   },
   {
+    // This fires whenever an *authenticated* user (AuthGuard already
+    // passed on the outer `path: ''` in app-routing.module.ts) ends up
+    // navigating to the bare root path -- e.g. when Android restores the
+    // app's WebView after backgrounding/memory reclaim and the router's
+    // initial navigation briefly resolves to '' before
+    // AppComponent.initializeApp() finishes and navigates explicitly.
+    // It previously redirected to '/onboarding', which meant ANY such
+    // event sent already-onboarded users back to onboarding regardless of
+    // `onboardingComplete` -- the actual first-run-vs-returning-user
+    // decision belongs solely to AppStartupRouteService at real app
+    // startup, not to this catch-all. Redirecting into the app shell
+    // instead is always safe here.
     path: '',
-    redirectTo: '/tabs/login',
+    redirectTo: '/tabs/home',
     pathMatch: 'full',
   },
 ];

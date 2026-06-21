@@ -1,4 +1,4 @@
-<ion-content fullscreen="true">
+<ion-content [fullscreen]="true" class="app-page">
   <div class="container">
     <div class="logo-container">
       <img
@@ -8,80 +8,25 @@
       />
     </div>
     <div class="top">
-      <h2 class="title">Register Now</h2>
-      <p class="subtitle">Create your account by filling up the form</p>
+      <h2 class="title app-text-h1">Register Now</h2>
+      <p class="subtitle app-text-body">Create your account by filling up the form</p>
     </div>
 
-    <div class="social-login" *ngIf="socialLoginEnabled">
+    <div class="social-login">
       <ion-button
         expand="block"
-        class="twitter"
-        (click)="socialLogin(LoginType.TWITTER)"
+        class="google app-primary-action"
+        [disabled]="isSubmitting"
+        (click)="registerWithGoogle()"
       >
-        <ion-icon name="logo-twitter"></ion-icon>
-      </ion-button>
-      <ion-button
-        expand="block"
-        class="facebook"
-        (click)="socialLogin(LoginType.FACEBOOK)"
-      >
-        <ion-icon name="logo-facebook"></ion-icon>
-      </ion-button>
-      <ion-button
-        expand="block"
-        class="google"
-        (click)="socialLogin(LoginType.GOOGLE)"
-      >
-        <ion-icon name="logo-google"></ion-icon>
+        <ion-icon slot="start" name="logo-google"></ion-icon>
+        Continue with Google
       </ion-button>
     </div>
+    <p class="or-register-with-email app-text-caption">Or sign up with email</p>
 
     <div class="register-form">
       <form [formGroup]="registerForm">
-        <ion-item>
-          <ion-input
-            labelPlacement="stacked"
-            label="Name"
-            formControlName="name"
-            placeholder="John"
-          >
-            <ion-icon slot="start" name="person"></ion-icon>
-          </ion-input>
-        </ion-item>
-        <ion-note
-          [style.visibility]="
-            registerForm.get('name')?.invalid &&
-            registerForm.get('name')?.touched
-              ? 'visible'
-              : 'hidden'
-          "
-          color="danger"
-        >
-          Name is required.
-        </ion-note>
-
-        <ion-item>
-          <ion-input
-            labelPlacement="stacked"
-            label="Lastname"
-            formControlName="lastname"
-            placeholder="Doe"
-          >
-            <ion-icon slot="start" name="person"></ion-icon>
-          </ion-input>
-        </ion-item>
-        <ion-note
-          [style.visibility]="
-            registerForm.get('lastname')?.invalid &&
-            registerForm.get('lastname')?.touched
-              ? 'visible'
-              : 'hidden'
-          "
-          color="danger"
-        >
-          Lastname is required.
-        </ion-note>
-
         <ion-item>
           <ion-input
             labelPlacement="stacked"
@@ -93,11 +38,10 @@
           </ion-input>
         </ion-item>
         <ion-note
-          [style.visibility]="
-            registerForm.get('email')?.invalid &&
-            registerForm.get('email')?.touched
-              ? 'visible'
-              : 'hidden'
+          class="app-text-caption"
+          [class.error-note--hidden]="
+            !(registerForm.get('email')?.invalid &&
+            registerForm.get('email')?.touched)
           "
           color="danger"
         >
@@ -125,13 +69,10 @@
         </ion-item>
         <div></div>
         <ion-note
-          [style.min-height]="'20px'"
-          [style.display]="'block'"
-          [style.visibility]="
-            registerForm.get('password')?.invalid &&
-            registerForm.get('password')?.touched
-              ? 'visible'
-              : 'hidden'
+          class="app-text-caption error-note--block"
+          [class.error-note--hidden]="
+            !(registerForm.get('password')?.invalid &&
+            registerForm.get('password')?.touched)
           "
           color="danger"
         >
@@ -165,13 +106,10 @@
           </ion-input>
         </ion-item>
         <ion-note
-          [style.min-height]="'20px'"
-          [style.display]="'block'"
-          [style.visibility]="
-            registerForm.get('confirmPassword')?.invalid &&
-            registerForm.get('confirmPassword')?.touched
-              ? 'visible'
-              : 'hidden'
+          class="app-text-caption error-note--block"
+          [class.error-note--hidden]="
+            !(registerForm.get('confirmPassword')?.invalid &&
+            registerForm.get('confirmPassword')?.touched)
           "
           color="danger"
         >
@@ -193,12 +131,15 @@
 
     <div class="bottom">
       <ion-button
-        class="regsiter"
+        class="regsiter app-primary-action"
         (click)="register()"
-        [disabled]="registerForm.invalid"
-        >Register</ion-button
+        [disabled]="registerForm.invalid || isSubmitting"
+        >Create account</ion-button
       >
-      <p>Already have an account? <a (click)="navigateToLogin()">Login</a></p>
+      <p class="app-text-body">
+        Already have an account?
+        <a class="secondary-link" (click)="navigateToLogin()">Login</a>
+      </p>
     </div>
   </div>
 </ion-content>

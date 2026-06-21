@@ -1,44 +1,93 @@
 <div class="checklist-items-container">
   <!-- Items List -->
-  <div class="items-list" *ngIf="checklist.items && checklist.items.length > 0">
+  <div class="items-list" *ngIf="items && items.length > 0">
     <ion-card
-      *ngFor="let item of checklist.items; let i = index"
-      class="item-card"
+      *ngFor="let item of items; let i = index"
+      class="app-card app-card--labeled item-card"
       [class.completed]="item.isCompleted"
       [class.editing]="editingItemIndex === i && !isNewItem(i)"
-      style="background: #222428 !important"
     >
-      <ion-card-content style="background: #222428 !important">
+      <ion-card-content>
         <!-- Editing Mode for EXISTING items -->
         <div *ngIf="editingItemIndex === i && !isNewItem(i)" class="edit-mode">
-          <app-item-form
-            [initialData]="{
-              name: tempItem.name,
-              quantity: tempItem.quantity || 1,
-              fragile: tempItem.isFragile,
-              expires: tempItem.expires,
-              expirationDate: tempItem.expirationDate?.toISOString()
-            }"
-            saveButtonText="Save"
-            cancelButtonText="Cancel"
-            [showQuantity]="true"
-            [showImage]="true"
-            (save)="onItemFormSave($event)"
-            (cancel)="cancelEdit()"
-          >
-          </app-item-form>
+          <ion-item>
+            <ion-input
+              labelPlacement="stacked"
+              label="Title"
+              [(ngModel)]="tempTitle"
+              placeholder="Item title"
+              required
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-textarea
+              labelPlacement="stacked"
+              label="Notes (optional)"
+              [(ngModel)]="tempNotes"
+              autoGrow="true"
+            ></ion-textarea>
+          </ion-item>
+          <ion-item>
+            <ion-input
+              labelPlacement="stacked"
+              label="Quantity"
+              type="number"
+              min="1"
+              [(ngModel)]="tempQuantity"
+            ></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox [(ngModel)]="tempIsFragile">Fragile</ion-checkbox>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox
+              [(ngModel)]="tempExpires"
+              (ionChange)="onExpiresChange()"
+              >Expires</ion-checkbox
+            >
+          </ion-item>
+          <ion-item *ngIf="tempExpires">
+            <ion-input
+              labelPlacement="stacked"
+              label="Expiration date"
+              type="date"
+              [(ngModel)]="tempExpirationDate"
+            ></ion-input>
+          </ion-item>
+          <div class="image-section">
+            <img
+              *ngIf="tempImageUri"
+              [src]="tempImageUri"
+              class="item-image-preview"
+            />
+            <ion-button fill="outline" size="small" (click)="takePicture()">
+              <ion-icon name="camera" slot="start"></ion-icon>
+              {{ tempImageUri ? 'Change Photo' : 'Add Photo' }}
+            </ion-button>
+            <ion-button
+              *ngIf="tempImageUri"
+              fill="clear"
+              size="small"
+              color="danger"
+              (click)="removeImage()"
+            >
+              Remove
+            </ion-button>
+          </div>
+          <div class="edit-actions">
+            <ion-button fill="clear" (click)="cancelEdit()">Cancel</ion-button>
+            <ion-button [disabled]="!tempTitle?.trim()" (click)="saveItem()"
+              >Save</ion-button
+            >
+          </div>
         </div>
 
         <!-- View Mode -->
         <div *ngIf="editingItemIndex !== i || isNewItem(i)" class="view-mode">
-          <!-- Tags en la parte superior -->
+          <!-- Tags -->
           <div
             class="item-tags-top"
-            *ngIf="
-              item.isFragile ||
-              (item.expires && item.expirationDate) ||
-              item.imageUrl
-            "
+            *ngIf="item.isFragile || (item.expires && item.expirationDate) || item.imageUri"
           >
             <ion-chip
               *ngIf="item.isFragile"
@@ -61,7 +110,7 @@
               </ion-label>
             </ion-chip>
             <ion-chip
-              *ngIf="item.imageUrl"
+              *ngIf="item.imageUri"
               color="tertiary"
               size="small"
               class="property-chip photo-chip"
@@ -79,14 +128,25 @@
               [checked]="item.isCompleted"
               (ionChange)="toggleItem(item)"
               class="item-checkbox"
+              [class.item-checkbox--completed]="item.isCompleted"
             >
             </ion-checkbox>
 
             <!-- Item Info -->
             <div class="item-info" (click)="toggleItem(item)">
-              <div class="item-name" [class.strikethrough]="item.isCompleted">
-                {{ item.name }}
+              <div
+                class="item-name app-text-body"
+                [class.strikethrough]="item.isCompleted"
+              >
+                {{ item.title }}
+                <span
+                  *ngIf="item.quantity && item.quantity > 1"
+                  class="item-quantity app-text-mono"
+                >
+                  x{{ item.quantity }}
+                </span>
               </div>
+              <div class="item-notes app-text-caption" *ngIf="item.notes">{{ item.notes }}</div>
             </div>
 
             <!-- Action Buttons -->
@@ -110,43 +170,97 @@
   </div>
 
   <!-- Empty State -->
-  <div
-    class="empty-state"
-    *ngIf="!checklist.items || checklist.items.length === 0"
-  >
-    <ion-icon name="clipboard-outline" class="empty-icon"></ion-icon>
-    <h3>No Items Yet</h3>
-    <p>Add items to your checklist to get organized</p>
+  <div class="app-empty-state" *ngIf="!items || items.length === 0">
+    <ion-icon name="clipboard-outline"></ion-icon>
+    <h3 class="app-text-h2">No Items Yet</h3>
+    <p class="app-text-body">Add items to your checklist to get organized</p>
   </div>
 
   <!-- Add Item Button -->
   <div class="add-item-section">
-    <ion-button expand="block" fill="outline" (click)="addItem()">
+    <ion-button
+      expand="block"
+      fill="solid"
+      class="app-primary-action"
+      (click)="addItem()"
+      *ngIf="editingItemIndex === -1"
+    >
       <ion-icon name="add" slot="start"></ion-icon>
       Add Item
     </ion-button>
 
     <!-- Inline Add Form (appears when adding new item) -->
-    <div
-      *ngIf="editingItemIndex !== -1 && isNewItem(editingItemIndex)"
-      class="inline-add-form"
-    >
-      <app-item-form
-        [initialData]="{
-          name: tempItem.name,
-          quantity: tempItem.quantity || 1,
-          fragile: tempItem.isFragile,
-          expires: tempItem.expires,
-          expirationDate: tempItem.expirationDate?.toISOString()
-        }"
-        saveButtonText="Save"
-        cancelButtonText="Cancel"
-        [showQuantity]="true"
-        [showImage]="true"
-        (save)="onItemFormSave($event)"
-        (cancel)="cancelEdit()"
-      >
-      </app-item-form>
+    <div *ngIf="editingItemIndex !== -1 && isNewItem(editingItemIndex)" class="inline-add-form">
+      <ion-item>
+        <ion-input
+          labelPlacement="stacked"
+          label="Title"
+          [(ngModel)]="tempTitle"
+          placeholder="Item title"
+          required
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-textarea
+          labelPlacement="stacked"
+          label="Notes (optional)"
+          [(ngModel)]="tempNotes"
+          autoGrow="true"
+        ></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <ion-input
+          labelPlacement="stacked"
+          label="Quantity"
+          type="number"
+          min="1"
+          [(ngModel)]="tempQuantity"
+        ></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-checkbox [(ngModel)]="tempIsFragile">Fragile</ion-checkbox>
+      </ion-item>
+      <ion-item>
+        <ion-checkbox
+          [(ngModel)]="tempExpires"
+          (ionChange)="onExpiresChange()"
+          >Expires</ion-checkbox
+        >
+      </ion-item>
+      <ion-item *ngIf="tempExpires">
+        <ion-input
+          labelPlacement="stacked"
+          label="Expiration date"
+          type="date"
+          [(ngModel)]="tempExpirationDate"
+        ></ion-input>
+      </ion-item>
+      <div class="image-section">
+        <img
+          *ngIf="tempImageUri"
+          [src]="tempImageUri"
+          class="item-image-preview"
+        />
+        <ion-button fill="outline" size="small" (click)="takePicture()">
+          <ion-icon name="camera" slot="start"></ion-icon>
+          {{ tempImageUri ? 'Change Photo' : 'Add Photo' }}
+        </ion-button>
+        <ion-button
+          *ngIf="tempImageUri"
+          fill="clear"
+          size="small"
+          color="danger"
+          (click)="removeImage()"
+        >
+          Remove
+        </ion-button>
+      </div>
+      <div class="edit-actions">
+        <ion-button fill="clear" (click)="cancelEdit()">Cancel</ion-button>
+        <ion-button [disabled]="!tempTitle?.trim()" (click)="saveItem()"
+          >Save</ion-button
+        >
+      </div>
     </div>
   </div>
 </div>

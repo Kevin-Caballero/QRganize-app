@@ -80,9 +80,19 @@ export class HomePage implements OnInit, OnDestroy {
     await modal.present();
 
     // Limpiamos la suscripción cuando se cierra el modal
-    const { data } = await modal.onDidDismiss();
+    const { data, role } = await modal.onDidDismiss();
     if (this.subscription) {
       this.subscription.unsubscribe();
+    }
+
+    // Consolidated create + add-items flow (Spec 009 Step 4): when the modal
+    // dismisses with role 'confirm' and a created box (the items sub-step's
+    // "Done" action), box-modal.component.ts already created the box itself
+    // via BoxService — add it to the in-memory list here instead of going
+    // through boxStateService.createBox() (which is only used by the legacy
+    // boxSubject path and dismisses the modal immediately on success).
+    if (role === 'confirm' && data?.box) {
+      this.boxStateService.addBoxToState(data.box);
     }
   }
 }

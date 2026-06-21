@@ -5,21 +5,22 @@ import {
   ToastController,
 } from '@ionic/angular';
 import { Storage } from '@ionic/storage-angular';
-import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BoxService } from '../home/services/box.service';
 import { ItemService } from '../home/services/item.service';
-import { ChecklistService } from 'src/app/shared/services/checklist.service';
-import { forkJoin, of } from 'rxjs';
+import { LocalChecklistsService } from 'src/app/shared/services/local-checklists.service';
+import { AuthGateService } from 'src/app/shared/services/auth-gate.service';
+import { AuthUser } from 'src/app/shared/models/auth-user';
+import {
+  AppearanceService,
+  AppTheme,
+} from 'src/app/shared/services/appearance.service';
+import { ExpirationNotificationsService } from 'src/app/shared/services/expiration-notifications.service';
+import { forkJoin, from, of } from 'rxjs';
 import { catchError, finalize, switchMap, map } from 'rxjs/operators';
 
-interface User {
-  displayName: string | null;
-  email: string | null;
-  photoURL: string | null;
-  uid: string;
-}
+type User = AuthUser;
 
 @Component({
   selector: 'app-settings',
@@ -37,8 +38,7 @@ export class SettingsPage implements OnInit {
   isLoadingStats: boolean = false;
 
   // Appearance properties
-  darkMode: boolean = false;
-  fontSize: string = 'medium';
+  theme: AppTheme = 'system';
 
   // Notification properties
   expirationReminders: boolean = true;
@@ -57,7 +57,10 @@ export class SettingsPage implements OnInit {
     private router: Router,
     private boxService: BoxService,
     private itemService: ItemService,
-    private checklistService: ChecklistService
+    private localChecklistsService: LocalChecklistsService,
+    private authGateService: AuthGateService,
+    private appearanceService: AppearanceService,
+    private expirationNotificationsService: ExpirationNotificationsService
   ) {}
 
   async ngOnInit() {
@@ -78,18 +81,28 @@ export class SettingsPage implements OnInit {
   }
 
   async loadSettings() {
-    // Load saved preferences
-    this.darkMode = (await this.storage.get('darkMode')) || false;
-    this.fontSize = (await this.storage.get('fontSize')) || 'medium';
+    // Load saved preferences (display state for the ion-selects only --
+    // the actual appearance was already applied at app startup via
+    // AppearanceService.loadAndApplyPersistedAppearance(), see
+    // app.component.ts).
+    this.theme = ((await this.storage.get('theme')) || 'system') as AppTheme;
     this.expirationReminders =
       (await this.storage.get('expirationReminders')) !== false;
     this.reminderDays = (await this.storage.get('reminderDays')) || '3';
 
-    // Apply dark mode if active
-    this.applyDarkMode(this.darkMode);
-
-    // Apply font size
-    this.applyFontSize(this.fontSize);
+    // Spec 017's "permission-state honesty" requirement: if the stored
+    // value says reminders are on but the OS permission has since been
+    // revoked (e.g. the user turned it off in Android app settings), the
+    // toggle must not keep lying about being "on" with nothing actually
+    // scheduled. Flip the in-memory + persisted value to match reality.
+    if (this.expirationReminders) {
+      const hasPermission =
+        await this.expirationNotificationsService.hasPermission();
+      if (!hasPermission) {
+        this.expirationReminders = false;
+        await this.storage.set('expirationReminders', false);
+      }
+    }
   }
 
   async loadUserStats() {
@@ -104,7 +117,9 @@ export class SettingsPage implements OnInit {
         })
       );
 
-      const checklists$ = this.checklistService.getChecklists().pipe(
+      const checklists$ = from(
+        this.localChecklistsService.getAllChecklists()
+      ).pipe(
         catchError((error) => {
           console.error('Error fetching checklists:', error);
           return of([]);
@@ -193,45 +208,65 @@ export class SettingsPage implements OnInit {
   }
 
   async checkAuthStatus() {
-    // Obtener información del usuario desde storage
-    const userData = await this.storage.get('user');
-    if (userData) {
-      this.user = JSON.parse(userData);
+    // Per Spec 010, the current user comes from the Firebase Authentication
+    // gate (AuthGateService) rather than legacy `storage.get('user')`.
+    this.user = await this.authGateService.getCurrentUser();
+  }
+
+  changeTheme() {
+    this.appearanceService.applyTheme(this.theme);
+    this.storage.set('theme', this.theme);
+  }
+
+  /**
+   * Handler for the "Expiration Reminders" toggle (Spec 017). Kept separate
+   * from `onReminderDaysChange()` (the "days before" select's handler)
+   * because turning the toggle on/off has a different side effect
+   * (request permission / cancel all) than changing the offset
+   * (reschedule all with the new offset) -- collapsing them into one
+   * shared method would make the permission-request path harder to follow.
+   */
+  async onExpirationRemindersChange() {
+    if (this.expirationReminders) {
+      const granted = await this.expirationNotificationsService.requestPermission();
+      if (!granted) {
+        // Reflect the real denied state rather than showing "on" while
+        // scheduling nothing (Spec 017's UI/UX requirement).
+        this.expirationReminders = false;
+        await this.storage.set('expirationReminders', false);
+        await this.showToast(
+          'Reminders are off until notifications are allowed in your device settings.'
+        );
+        return;
+      }
+
+      await this.storage.set('expirationReminders', true);
+      await this.expirationNotificationsService.rescheduleAll(
+        Number(this.reminderDays) || 3
+      );
+      return;
     }
+
+    await this.storage.set('expirationReminders', false);
+    await this.expirationNotificationsService.cancelAll();
   }
 
-  toggleDarkMode() {
-    this.applyDarkMode(this.darkMode);
-    this.storage.set('darkMode', this.darkMode);
-  }
+  /**
+   * Handler for the "Reminder Time" (`reminderDays`) select (Spec 017). See
+   * `onExpirationRemindersChange()`'s doc comment for why this is a
+   * separate method.
+   */
+  async onReminderDaysChange() {
+    await this.storage.set('reminderDays', this.reminderDays);
 
-  applyDarkMode(isDark: boolean) {
-    if (isDark) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
+    if (this.expirationReminders) {
+      await this.expirationNotificationsService.rescheduleAll(
+        Number(this.reminderDays) || 3
+      );
     }
-  }
-
-  changeFontSize() {
-    this.applyFontSize(this.fontSize);
-    this.storage.set('fontSize', this.fontSize);
-  }
-
-  applyFontSize(size: string) {
-    // Eliminar clases previas de tamaño
-    document.body.classList.remove('font-small', 'font-medium', 'font-large');
-    // Aplicar nueva clase de tamaño
-    document.body.classList.add(`font-${size}`);
-  }
-
-  updateNotificationSettings() {
-    this.storage.set('expirationReminders', this.expirationReminders);
-    this.storage.set('reminderDays', this.reminderDays);
   }
 
   async login() {
-    // Authentication logic would be implemented here
     this.router.navigate(['/login']);
   }
 
@@ -248,10 +283,11 @@ export class SettingsPage implements OnInit {
           text: 'Log Out',
           role: 'confirm',
           handler: async () => {
-            // Logout logic
+            // Sign-out goes through AuthGateService -> AuthRepository ->
+            // FirebaseAuthRepository (Spec 010), never the Firebase plugin
+            // directly.
+            await this.authGateService.signOut();
             this.user = null;
-            await this.storage.remove('user');
-            await this.storage.remove('authToken');
             this.showToast('Successfully logged out');
             this.router.navigate(['/login']);
           },

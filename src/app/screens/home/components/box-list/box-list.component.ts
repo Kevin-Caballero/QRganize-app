@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { BoxService } from '../../services/box.service';
 import { Box } from '../../models/box.interface';
 import {
@@ -8,6 +8,7 @@ import {
 import { BoxStateService } from '../../services/box-state.service';
 import {
   AlertController,
+  IonItemSliding,
   ModalController,
   NavController,
 } from '@ionic/angular';
@@ -18,9 +19,10 @@ import { ErrorHandlerService } from 'src/app/shared/services/error-handler.servi
 import { QrModalComponent } from '../qr-modal/qr-modal.component';
 import { ItemService } from '../../services/item.service';
 import { forkJoin, Observable, of } from 'rxjs';
-import { ChecklistService } from 'src/app/shared/services/checklist.service';
-import { Checklist } from 'src/app/shared/interfaces/checklist.interface';
+import { LocalChecklistsService } from 'src/app/shared/services/local-checklists.service';
+import { LocalChecklist } from 'src/app/shared/models/local-checklist';
 import { catchError, map } from 'rxjs/operators';
+import { ImageUrlService } from 'src/app/shared/services/image-url.service';
 
 @Component({
   selector: 'app-box-list',
@@ -30,10 +32,10 @@ import { catchError, map } from 'rxjs/operators';
 export class BoxListComponent implements OnInit {
   boxes: Box[] = [];
   count: number;
-  boxItemCounts: { [boxId: number]: number } = {};
-  boxChecklistMap: { [boxId: number]: Checklist | null } = {};
+  boxItemCounts: { [boxId: string]: number } = {};
+  boxChecklistMap: { [boxId: string]: LocalChecklist | null } = {};
   boxItemProperties: {
-    [boxId: number]: {
+    [boxId: string]: {
       hasFragileItems: boolean;
       hasExpiringItems: boolean;
       hasImagesItems: boolean;
@@ -45,6 +47,19 @@ export class BoxListComponent implements OnInit {
   selectedBoxes: Box[] = [];
   longPressActive = false;
 
+  // Resolved box thumbnail sources (Spec 012): resolution is async (web
+  // must read the file back out of Capacitor's IndexedDB-backed Filesystem
+  // storage and re-encode it as a fresh data: URL on every render), so this
+  // is populated via resolveImageSrc() rather than bound directly against
+  // the raw stored `box.imageUrl` value.
+  boxImageUrls: { [boxId: string]: string | null } = {};
+
+  // All sliding items currently rendered (Spec 015) -- used to close any
+  // open swipe-revealed item when entering multi-select mode via long-press,
+  // since swipe-to-reveal and long-press multi-select are mutually exclusive.
+  @ViewChildren(IonItemSliding)
+  slidingItems!: QueryList<IonItemSliding>;
+
   constructor(
     private boxStateService: BoxStateService,
     private alertController: AlertController,
@@ -54,7 +69,8 @@ export class BoxListComponent implements OnInit {
     private navController: NavController,
     private modalController: ModalController,
     private itemService: ItemService,
-    private checklistService: ChecklistService
+    private localChecklistsService: LocalChecklistsService,
+    private imageUrlService: ImageUrlService
   ) {}
 
   ngOnInit() {
@@ -68,7 +84,26 @@ export class BoxListComponent implements OnInit {
       this.count = data.count;
       this.loadItemCounts();
       this.loadChecklists();
+      this.resolveBoxImages();
     });
+  }
+
+  private resolveBoxImages() {
+    this.boxImageUrls = {};
+    this.boxes.forEach((box) => {
+      if (!box.id) return;
+      this.imageUrlService.resolveImageSrc(box.imageUrl).then((resolved) => {
+        this.boxImageUrls[box.id as string] = resolved;
+      });
+    });
+  }
+
+  /**
+   * Resolved (render-time) box thumbnail source, or null for "no image"
+   * (including dead blob: rows — see ImageUrlService.resolveImageSrc).
+   */
+  getResolvedBoxImageUrl(box: Box): string | null {
+    return box.id ? this.boxImageUrls[box.id] ?? null : null;
   }
 
   private loadChecklists() {
@@ -77,22 +112,24 @@ export class BoxListComponent implements OnInit {
     }
 
     // Cargamos todos los checklists una sola vez
-    this.checklistService.getChecklists().subscribe({
-      next: (checklists) => {
+    this.localChecklistsService
+      .getAllChecklists()
+      .then((checklists) => {
         this.boxChecklistMap = {};
 
-        // Mapeamos cada checklist a su caja
+        // Mapeamos cada checklist a su caja. `LocalChecklist.boxId` and
+        // `box.id` are both string UUIDs now, so this comparison works
+        // correctly (see docs/specs.md Spec 007 addendum).
         this.boxes.forEach((box) => {
           if (box.id) {
             const checklist = checklists.find((cl) => cl.boxId === box.id);
             this.boxChecklistMap[box.id] = checklist || null;
           }
         });
-      },
-      error: (error) => {
+      })
+      .catch((error) => {
         console.warn('Error loading checklists:', error);
-      },
-    });
+      });
   }
 
   private loadItemCounts() {
@@ -169,7 +206,7 @@ export class BoxListComponent implements OnInit {
 
   getChecklistName(box: Box): string | null {
     return box.id && this.boxChecklistMap[box.id]
-      ? this.boxChecklistMap[box.id]?.name || null
+      ? this.boxChecklistMap[box.id]?.title || null
       : null;
   }
 
@@ -189,6 +226,13 @@ export class BoxListComponent implements OnInit {
     return box.id && this.boxItemProperties[box.id]
       ? this.boxItemProperties[box.id].hasImagesItems
       : false;
+  }
+
+  // `packingStatus` is optional on the legacy `Box` view-model (Spec 009
+  // Step 2) -- existing boxes predating the migration default to 'packing'
+  // here even though the DB default already guarantees a value.
+  getPackingStatus(box: Box): 'packing' | 'sealed' {
+    return box.packingStatus ?? 'packing';
   }
 
   onIonInfinite($event: IonInfiniteScrollCustomEvent<void>) {
@@ -221,8 +265,14 @@ export class BoxListComponent implements OnInit {
   }
 
   // Manejo de long press para iniciar selección múltiple
-  onLongPress(box: Box, event: Event) {
+  onLongPress(box: Box, event: Event, slidingItem?: IonItemSliding) {
     event.preventDefault();
+    // Entering selection mode is mutually exclusive with swipe-to-reveal
+    // (Spec 015): close the sliding item that triggered the long-press
+    // (in case it was mid-swipe) and any other sliding item that may
+    // currently be open, before flipping into multi-select.
+    slidingItem?.close();
+    this.slidingItems?.forEach((item) => item.close());
     if (!this.isSelectionMode) {
       this.isSelectionMode = true;
       this.toggleBoxSelection(box);

@@ -2,8 +2,8 @@
   <!-- Empty State -->
   <div *ngIf="boxes.length === 0" class="empty-state">
     <ion-icon name="cube-outline" class="empty-icon"></ion-icon>
-    <h2>No Boxes Yet</h2>
-    <p>Create your first box to start organizing your items</p>
+    <h2>Nothing packed yet</h2>
+    <p>Start your first box.</p>
     <ion-button fill="solid" color="primary" (click)="openCreateModal()">
       <ion-icon name="add" slot="start"></ion-icon>
       CREATE BOX
@@ -27,103 +27,116 @@
   </div>
 
   <ion-list *ngIf="boxes.length > 0">
-    <ion-card
+    <ion-item-sliding
       *ngFor="let box of boxes; let index"
-      class="card"
-      [class.selected]="isBoxSelected(box)"
-      (click)="onBoxSelected(box)"
-      (press)="onLongPress(box, $event)"
-      (contextmenu)="onLongPress(box, $event)"
+      #slidingBox
+      [disabled]="isSelectionMode"
     >
-      <div
-        class="top-section"
-        [ngStyle]="
-          box.imageUrl
-            ? {
-                'background-image': 'url(' + box.imageUrl + ')',
-                'background-size': 'cover',
-                'background-position': 'center'
-              }
-            : {}
-        "
+      <ion-item
+        class="card app-card--labeled"
+        [class.selected]="isBoxSelected(box)"
+        lines="none"
+        detail="false"
+        (click)="onBoxSelected(box)"
+        (press)="onLongPress(box, $event, slidingBox)"
+        (contextmenu)="onLongPress(box, $event, slidingBox)"
       >
-        <!-- Indicador de selección -->
-        <div *ngIf="isSelectionMode" class="selection-indicator">
-          <ion-icon
-            [name]="isBoxSelected(box) ? 'checkmark-circle' : 'ellipse-outline'"
-            [color]="isBoxSelected(box) ? 'success' : 'medium'"
-          >
-          </ion-icon>
-        </div>
-        <div class="border"></div>
-        <div class="icons">
-          <div class="logo" title="{{ box.name }}">
-            <span class="ellipsis-text">{{ box.name }}</span>
-          </div>
-          <div class="actions">
-            <ion-button
-              color="danger"
-              size="small"
-              (click)="onDelete(box, $event)"
+        <div class="card-body">
+          <div class="card-header">
+            <div class="card-header__title" title="{{ box.name }}">
+              <span class="ellipsis-text app-text-h2">{{ box.name }}</span>
+            </div>
+            <span
+              class="app-badge"
+              [class.app-badge--packing]="getPackingStatus(box) === 'packing'"
+              [class.app-badge--sealed]="getPackingStatus(box) === 'sealed'"
             >
-              <ion-icon
-                color="light"
-                slot="icon-only"
-                name="trash-outline"
-              ></ion-icon>
-            </ion-button>
+              {{ getPackingStatus(box) === 'sealed' ? 'Sealed' : 'Packing' }}
+            </span>
           </div>
-        </div>
-      </div>
-      <div class="bottom-section">
-        <span class="title" title="{{ box.description }}">{{
-          box.description
-        }}</span>
-        <!-- Checklist badge if assigned -->
-        <div *ngIf="hasChecklist(box)" class="checklist-badge">
-          <ion-icon name="checkbox-outline"></ion-icon>
-          <span>{{ getChecklistName(box) }}</span>
-        </div>
-        <!-- Item properties indicators -->
-        <div class="item-properties" *ngIf="getItemCount(box) > 0">
-          <ion-chip *ngIf="hasFragileItems(box)" color="warning" size="small">
-            <ion-icon name="warning-outline"></ion-icon>
-            <ion-label>Fragile</ion-label>
-          </ion-chip>
-          <ion-chip *ngIf="hasExpiringItems(box)" color="danger" size="small">
-            <ion-icon name="calendar-outline"></ion-icon>
-            <ion-label>Expiring</ion-label>
-          </ion-chip>
-          <ion-chip
-            *ngIf="hasItemsWithImages(box)"
-            color="primary"
-            size="small"
+          <div
+            class="top-section"
+            [ngStyle]="
+              getResolvedBoxImageUrl(box)
+                ? {
+                    'background-image': 'url(' + getResolvedBoxImageUrl(box) + ')',
+                    'background-size': 'cover',
+                    'background-position': 'center'
+                  }
+                : {}
+            "
           >
-            <ion-icon name="image-outline"></ion-icon>
-            <ion-label>Photos</ion-label>
-          </ion-chip>
-        </div>
-
-        <div class="row row1">
-          <div class="item">
-            <span class="big-text">{{ getItemCount(box) }}</span>
-            <span class="regular-text">Items</span>
+            <!-- Indicador de selección -->
+            <div *ngIf="isSelectionMode" class="selection-indicator">
+              <ion-icon
+                [name]="isBoxSelected(box) ? 'checkmark-circle' : 'ellipse-outline'"
+                [color]="isBoxSelected(box) ? 'success' : 'medium'"
+              >
+              </ion-icon>
+            </div>
           </div>
-          <div class="item">
-            <!-- QR ICON -->
-            <ion-button fill="clear" (click)="onQrSelected(box, $event)">
-              <ion-icon slot="icon-only" name="qr-code-outline"></ion-icon>
-            </ion-button>
-          </div>
-          <div class="item">
-            <span class="big-text">{{
-              box.createdAt | date : "dd/MM/yyyy"
+          <div class="bottom-section">
+            <span class="title" title="{{ box.description }}">{{
+              box.description
             }}</span>
-            <span class="regular-text">Created at</span>
+            <!-- Checklist badge + item property indicators, same row --
+                 the checklist badge used to be its own full-width block
+                 above this row; it's first here so it reads before
+                 Fragile/Expiring/Photos, per the design ask. -->
+            <div
+              class="item-properties"
+              *ngIf="hasChecklist(box) || getItemCount(box) > 0"
+            >
+              <div *ngIf="hasChecklist(box)" class="checklist-badge">
+                <ion-icon name="checkbox-outline"></ion-icon>
+                <span>{{ getChecklistName(box) }}</span>
+              </div>
+              <ion-chip *ngIf="hasFragileItems(box)" color="warning" size="small">
+                <ion-icon name="warning-outline"></ion-icon>
+                <ion-label>Fragile</ion-label>
+              </ion-chip>
+              <ion-chip *ngIf="hasExpiringItems(box)" color="danger" size="small">
+                <ion-icon name="calendar-outline"></ion-icon>
+                <ion-label>Expiring</ion-label>
+              </ion-chip>
+              <ion-chip
+                *ngIf="hasItemsWithImages(box)"
+                color="primary"
+                size="small"
+              >
+                <ion-icon name="image-outline"></ion-icon>
+                <ion-label>Photos</ion-label>
+              </ion-chip>
+            </div>
+
+            <div class="row row1">
+              <div class="item">
+                <span class="big-text app-text-mono">{{ getItemCount(box) }}</span>
+                <span class="regular-text">Items</span>
+              </div>
+              <div class="item">
+                <!-- QR ICON -->
+                <ion-button fill="clear" (click)="onQrSelected(box, $event)">
+                  <ion-icon slot="icon-only" name="qr-code-outline"></ion-icon>
+                </ion-button>
+              </div>
+              <div class="item">
+                <span class="big-text app-text-mono">{{
+                  box.createdAt | date : "dd/MM/yyyy"
+                }}</span>
+                <span class="regular-text">Created at</span>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </ion-card>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="onDelete(box, $event)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="onIonInfinite($event)">
     <ion-infinite-scroll-content

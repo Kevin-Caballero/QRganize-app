@@ -5,18 +5,31 @@
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title class="ion-text-center">
+    <ion-title class="ion-text-center app-text-h1">
       {{ isMultiple ? "Multiple QR Codes" : "QR Preview" }}
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="printQr()">Print</ion-button>
+      <ion-button (click)="printQr()" class="app-primary-action" fill="clear"
+        >Print</ion-button
+      >
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="qr-container" *ngFor="let item of multipleQrCodes">
-    <div class="qr-name">{{ item.name }}</div>
-    <img [src]="item.qrCode" alt="QR Code" />
+<ion-content class="qr-modal-content">
+  <!-- Only meaningful with more than one QR -- a single code always prints
+       at one size, so the layout choice has nothing to act on. -->
+  <ion-item *ngIf="renderedQrCodes.length > 1" lines="none" class="layout-select">
+    <ion-label>Size when printing</ion-label>
+    <ion-select [(ngModel)]="qrLayout" interface="popover" slot="end">
+      <ion-select-option value="large">Large (1-2 per sheet)</ion-select-option>
+      <ion-select-option value="medium">Medium (4 per sheet)</ion-select-option>
+      <ion-select-option value="small">Small (9 per sheet)</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <div class="qr-container" *ngFor="let item of renderedQrCodes">
+    <div class="qr-name app-text-mono">{{ item.name }}</div>
+    <img [src]="item.imageDataUrl" alt="QR Code" />
   </div>
 </ion-content>

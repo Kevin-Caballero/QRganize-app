@@ -1,13 +1,39 @@
+.box-detail-content {
+  --background: var(--app-color-bg);
+}
+
+.box-image-thumbnail {
+  border-radius: 50%;
+}
+
+.items-summary {
+  margin: 1em 0;
+}
+
+.seal-box-button,
+.reopen-box-button,
+.assign-checklist-button {
+  min-height: 44px;
+}
+
 ion-card-title {
   text-align: center;
   font-weight: bold;
   font-size: 1.5rem;
-  color: #fff;
+  color: var(--app-color-ink);
+}
+
+ion-card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--app-space-sm);
 }
 
 ion-card {
-  background: #282e44;
-  border-radius: 10px;
+  position: relative;
+  background: var(--app-card-background);
+  border-radius: var(--app-radius-md);
   padding: 1em;
 
   .box {
@@ -18,7 +44,7 @@ ion-card {
     align-items: center;
     padding: 10px;
     background-color: var(--ion-card-background);
-    border-radius: 10px;
+    border-radius: var(--app-radius-md);
 
     ion-note {
       font-size: 0.9rem;
@@ -35,12 +61,17 @@ ion-card {
   ion-list {
     background: none;
 
+    ion-item-sliding {
+      margin-bottom: 8px;
+      border-radius: var(--app-radius-sm);
+      overflow: hidden;
+    }
+
     ion-item {
       --padding-start: 16px;
       --padding-end: 16px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      --background: #222428;
+      border-radius: var(--app-radius-sm);
+      --background: var(--app-color-surface);
 
       .icon-container {
         display: flex;
@@ -63,8 +94,8 @@ ion-card {
         }
 
         .quantity-badge {
-          background-color: var(--ion-color-primary);
-          color: white;
+          background-color: var(--app-color-accent-primary);
+          color: var(--app-color-accent-primary-contrast);
           font-weight: bold;
           border-radius: 50%;
           width: 24px;
@@ -76,7 +107,7 @@ ion-card {
           position: absolute;
           bottom: -10px;
           right: -5px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          box-shadow: var(--app-card-shadow);
         }
       }
 
@@ -97,7 +128,7 @@ ion-card {
       ion-label {
         h3 {
           font-weight: 600;
-          color: var(--ion-color-light);
+          color: var(--app-color-ink);
           margin-bottom: 4px;
           font-size: 1.1rem;
         }
@@ -105,8 +136,8 @@ ion-card {
         h2 {
           font-size: 1.1rem;
           font-weight: 500;
-          margin: 8px 0 4px 0;
-          color: var(--ion-color-dark);
+          margin: 0 0 4px 0;
+          color: var(--app-color-ink);
         }
 
         .quantity-display {
@@ -117,7 +148,7 @@ ion-card {
           span {
             font-weight: 600;
             font-size: 1rem;
-            color: #3880ff;
+            color: var(--app-color-accent-secondary);
             padding: 0;
           }
         }
@@ -125,42 +156,33 @@ ion-card {
         .item-properties {
           display: flex;
           flex-wrap: wrap;
-          gap: 4px;
-          margin-bottom: 2px;
-        }
+          gap: 6px;
+          margin: 4px 0 6px 0;
 
-        .item-properties {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 5px;
-          margin-bottom: 8px;
-
-          ion-chip {
-            height: 24px;
-            font-size: 0.8rem;
-            margin: 0;
+          .property-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: var(--app-radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            line-height: 1;
 
             ion-icon {
-              font-size: 14px;
-              margin-right: 2px;
+              font-size: 13px;
             }
 
-            &[color="warning"] {
-              --background: rgba(255, 183, 0, 0.15);
-              --color: #ffb700;
-              border: 1px solid rgba(255, 183, 0, 0.5);
+            &--warning {
+              background: rgba(var(--ion-color-warning-rgb), 0.15);
+              color: var(--ion-color-warning);
             }
 
-            &[color="danger"] {
-              --background: rgba(255, 0, 60, 0.15);
-              --color: #ff003c;
-              border: 1px solid rgba(255, 0, 60, 0.5);
-            }
-
-            &[color="primary"] {
-              --background: rgba(56, 128, 255, 0.15);
-              --color: #3880ff;
-              border: 1px solid rgba(56, 128, 255, 0.5);
+            &--danger {
+              background: rgba(var(--ion-color-danger-rgb), 0.15);
+              color: var(--ion-color-danger);
             }
           }
         }
@@ -174,7 +196,7 @@ ion-card {
 
         ion-note {
           font-size: 0.8rem;
-          color: #8c8c8c;
+          color: var(--app-empty-state-color);
         }
       }
 

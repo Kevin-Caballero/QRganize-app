@@ -2,20 +2,27 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BoxStateService } from '../../services/box-state.service';
 import { Box } from '../../models/box.interface';
-import { ModalController, ScrollDetail, AlertController } from '@ionic/angular';
+import {
+  ModalController,
+  ScrollDetail,
+  AlertController,
+  ActionSheetController,
+} from '@ionic/angular';
 import { IonContentCustomEvent } from '@ionic/core';
 import { ImageModalComponent } from 'src/app/components/image-modal/image-modal.component';
 import { ItemModalComponent } from '../item-modal/item-modal.component';
 import { ItemService } from '../../services/item.service';
 import { CreateItemDto, Item } from '../../models/item.interface';
 import { ToastService } from 'src/app/shared/services/toast.service';
-import { ChecklistService } from 'src/app/shared/services/checklist.service';
-import { Checklist } from 'src/app/shared/interfaces/checklist.interface';
+import { LocalChecklistsService } from 'src/app/shared/services/local-checklists.service';
+import { LocalChecklist } from 'src/app/shared/models/local-checklist';
 import { BoxModalComponent } from '../box-modal/box-modal.component';
 import { BoxReqDto } from '../../models/box-req.dto';
 import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ImageUrlService } from 'src/app/shared/services/image-url.service';
+import { BoxService } from '../../services/box.service';
+import { QrModalComponent } from '../qr-modal/qr-modal.component';
 
 @Component({
   selector: 'app-box-detail',
@@ -27,8 +34,16 @@ export class BoxDetailComponent implements OnInit {
   box: Box;
   items: Item[] = [];
   isLoadingItems = false;
-  assignedChecklist: Checklist | null = null;
+  assignedChecklist: LocalChecklist | null = null;
   isLoadingChecklist = false;
+
+  // Resolved image sources (Spec 012): resolution is async (web must read
+  // the file back out of Capacitor's IndexedDB-backed Filesystem storage
+  // and re-encode it as a fresh data: URL on every render), so these are
+  // populated via resolveImageSrc() rather than bound directly in the
+  // template against the raw stored value.
+  resolvedBoxImageUrl: string | null = null;
+  itemImageUrls: { [itemId: string]: string | null } = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -38,9 +53,13 @@ export class BoxDetailComponent implements OnInit {
     private itemService: ItemService,
     private alertController: AlertController,
     private toastService: ToastService,
-    private checklistService: ChecklistService,
-    private imageUrlService: ImageUrlService
+    private localChecklistsService: LocalChecklistsService,
+    private imageUrlService: ImageUrlService,
+    private boxService: BoxService,
+    private actionSheetController: ActionSheetController
   ) {}
+
+  isLoadingAvailableChecklists = false;
 
   ngOnInit() {
     this.loadBoxData();
@@ -56,23 +75,40 @@ export class BoxDetailComponent implements OnInit {
       if (this.box) {
         this.loadItems();
         this.loadAssignedChecklist();
+        this.resolveBoxImage();
       }
     });
   }
 
+  private resolveBoxImage() {
+    this.imageUrlService
+      .resolveImageSrc(this.box?.imageUrl)
+      .then((resolved) => {
+        this.resolvedBoxImageUrl = resolved;
+      });
+  }
+
   loadAssignedChecklist() {
-    if (!this.box?.id) return;
+    if (!this.box) {
+      this.assignedChecklist = null;
+      this.isLoadingChecklist = false;
+      return;
+    }
 
     this.isLoadingChecklist = true;
-    this.checklistService.getChecklistByBoxId(this.box.id).subscribe({
-      next: (checklist) => {
-        this.assignedChecklist = checklist;
+    // `LocalChecklist.boxId` and `box.id` are both string UUIDs now, so this
+    // lookup works correctly (see docs/specs.md Spec 007 addendum).
+    this.localChecklistsService
+      .getAllChecklists()
+      .then((checklists) => {
+        this.assignedChecklist =
+          checklists.find((cl) => cl.boxId === this.box.id) || null;
         this.isLoadingChecklist = false;
-      },
-      error: () => {
+      })
+      .catch(() => {
+        this.assignedChecklist = null;
         this.isLoadingChecklist = false;
-      },
-    });
+      });
   }
 
   loadItems() {
@@ -83,6 +119,7 @@ export class BoxDetailComponent implements OnInit {
       next: (items) => {
         this.items = items;
         this.isLoadingItems = false;
+        this.resolveItemImages(items);
       },
       error: () => {
         this.isLoadingItems = false;
@@ -91,11 +128,31 @@ export class BoxDetailComponent implements OnInit {
     });
   }
 
+  private resolveItemImages(items: Item[]) {
+    this.itemImageUrls = {};
+    items.forEach((item) => {
+      this.imageUrlService.resolveImageSrc(item.imageUrl).then((resolved) => {
+        this.itemImageUrls[item.id] = resolved;
+      });
+    });
+  }
+
+  /**
+   * Resolved (render-time) image source for an item, or null for "no
+   * image" (including dead blob: rows — see ImageUrlService.resolveImageSrc).
+   */
+  getResolvedItemImageUrl(item: Item): string | null {
+    return this.itemImageUrls[item.id] ?? null;
+  }
+
   logScrolling($event: IonContentCustomEvent<ScrollDetail>) {
     // throw new Error('Method not implemented.');
   }
 
-  async onImageClick(imageUrl: string) {
+  async onImageClick(imageUrl: string | null) {
+    if (!imageUrl) {
+      return;
+    }
     const modal = await this.modalController.create({
       component: ImageModalComponent,
       componentProps: {
@@ -106,6 +163,18 @@ export class BoxDetailComponent implements OnInit {
   }
 
   async onAddItem() {
+    // A sealed box represents a physically closed box with its QR already
+    // attached -- adding items behind its back would desync the item list
+    // from reality. Block and require an explicit "Reopen Box" first,
+    // rather than silently reopening or allowing the add (product decision,
+    // see Seal Box feature discussion).
+    if (this.getPackingStatus() === 'sealed') {
+      await this.toastService.presentErrorToast(
+        'Box is sealed. Reopen it to add items.'
+      );
+      return;
+    }
+
     const modal = await this.modalController.create({
       component: ItemModalComponent,
       componentProps: {
@@ -154,7 +223,7 @@ export class BoxDetailComponent implements OnInit {
     modal.present();
   }
 
-  async updateItem(itemId: number, itemData: Partial<CreateItemDto>) {
+  async updateItem(itemId: string, itemData: Partial<CreateItemDto>) {
     this.itemService.updateItem(itemId, itemData).subscribe({
       next: (updatedItem) => {
         const index = this.items.findIndex((item) => item.id === itemId);
@@ -193,7 +262,7 @@ export class BoxDetailComponent implements OnInit {
     await alert.present();
   }
 
-  deleteItem(itemId: number) {
+  deleteItem(itemId: string) {
     this.itemService.deleteItem(itemId).subscribe({
       next: () => {
         this.items = this.items.filter((item) => item.id !== itemId);
@@ -209,6 +278,154 @@ export class BoxDetailComponent implements OnInit {
     if (this.assignedChecklist) {
       this.router.navigate(['/tabs/checklist', this.assignedChecklist.id]);
     }
+  }
+
+  /**
+   * Spec 014 Fix 2: opens an action sheet listing checklists not currently
+   * assigned to any box, letting the user attach one to this box directly
+   * from box-detail. Goes through `BoxService` (never `LocalChecklistsService`
+   * directly), per docs/architecture.md's mandatory layering.
+   */
+  async onAssignChecklist() {
+    if (!this.box) return;
+
+    this.isLoadingAvailableChecklists = true;
+    this.boxService.getUnassignedChecklists().subscribe({
+      next: async (checklists) => {
+        this.isLoadingAvailableChecklists = false;
+
+        if (checklists.length === 0) {
+          this.toastService.presentErrorToast(
+            'No unassigned checklists available'
+          );
+          return;
+        }
+
+        const actionSheet = await this.actionSheetController.create({
+          header: 'Assign a checklist',
+          buttons: [
+            ...checklists.map((checklist) => ({
+              text: checklist.title,
+              handler: () => {
+                this.assignChecklist(checklist.id);
+              },
+            })),
+            {
+              text: 'Cancel',
+              role: 'cancel',
+            },
+          ],
+        });
+        await actionSheet.present();
+      },
+      error: () => {
+        this.isLoadingAvailableChecklists = false;
+        this.toastService.presentErrorToast(
+          'Error loading available checklists'
+        );
+      },
+    });
+  }
+
+  private assignChecklist(checklistId: string) {
+    if (!this.box) return;
+
+    this.boxService.assignChecklistToBox(checklistId, this.box.id).subscribe({
+      next: () => {
+        this.loadAssignedChecklist();
+        this.toastService.presentSuccessToast('Checklist assigned');
+      },
+      error: () => {
+        this.toastService.presentErrorToast('Error assigning checklist');
+      },
+    });
+  }
+
+  /**
+   * Spec 014 (optional unassign action): clears the assigned checklist's
+   * box link, returning the box to the "no checklist assigned" state.
+   */
+  onUnassignChecklist() {
+    if (!this.assignedChecklist) return;
+
+    this.boxService.unassignChecklist(this.assignedChecklist.id).subscribe({
+      next: () => {
+        this.loadAssignedChecklist();
+        this.toastService.presentSuccessToast('Checklist unassigned');
+      },
+      error: () => {
+        this.toastService.presentErrorToast('Error unassigning checklist');
+      },
+    });
+  }
+
+  // `packingStatus` is optional on the legacy `Box` view-model (Spec 009
+  // Step 2) -- defaults to 'packing' if missing.
+  getPackingStatus(): 'packing' | 'sealed' {
+    return this.box?.packingStatus ?? 'packing';
+  }
+
+  async onSealBox() {
+    if (!this.box) return;
+
+    if (!this.items || this.items.length === 0) {
+      const alert = await this.alertController.create({
+        header: 'Seal Box',
+        message: 'This box has no items yet. Seal it anyway?',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+          },
+          {
+            text: 'Seal',
+            role: 'confirm',
+            handler: () => {
+              this.sealBox();
+            },
+          },
+        ],
+      });
+      await alert.present();
+      return;
+    }
+
+    this.sealBox();
+  }
+
+  private sealBox() {
+    this.boxService.sealBox(this.box.id).subscribe({
+      next: async (sealedBox) => {
+        this.box = sealedBox;
+        await this.presentQrFullScreen(sealedBox.qrCode);
+      },
+      error: () => {
+        this.toastService.presentErrorToast('Error sealing box');
+      },
+    });
+  }
+
+  async onReopenBox() {
+    if (!this.box) return;
+
+    this.boxService.reopenBox(this.box.id).subscribe({
+      next: (reopenedBox) => {
+        this.box = reopenedBox;
+      },
+      error: () => {
+        this.toastService.presentErrorToast('Error reopening box');
+      },
+    });
+  }
+
+  private async presentQrFullScreen(qrData: string) {
+    const modal = await this.modalController.create({
+      component: QrModalComponent,
+      componentProps: {
+        qrData,
+      },
+    });
+    await modal.present();
   }
 
   async onEditBox() {
@@ -243,14 +460,26 @@ export class BoxDetailComponent implements OnInit {
   }
 
   /**
-   * Obtiene la URL de la imagen del item, considerando diferentes posibles propiedades
+   * Obtiene la URL de la imagen del item, considerando diferentes posibles propiedades.
+   *
+   * Prefers the already-resolved (Spec 012, async) value from
+   * `itemImageUrls` when available, since that's the one that's been
+   * through the durable-storage/dead-blob: handling. Falls back to the
+   * legacy qrcode-based lookups below for items that never had a resolved
+   * entry (e.g. resolution still in flight).
    */
   getItemImageUrl(item: Item): string | null {
+    const resolved = this.itemImageUrls[item.id];
+    if (resolved) {
+      return resolved;
+    }
+
     // Verificamos si tenemos una URL directa que podemos usar
     if (
       item.imageUrl &&
       typeof item.imageUrl === 'string' &&
-      item.imageUrl.trim() !== ''
+      item.imageUrl.trim() !== '' &&
+      !item.imageUrl.startsWith('blob:')
     ) {
       // Usar el servicio para obtener la URL absoluta
       return this.imageUrlService.getAbsoluteUrl(item.imageUrl);

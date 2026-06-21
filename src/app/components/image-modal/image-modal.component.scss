@@ -2,8 +2,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 300px;
-  margin-bottom: 20px;
+  // Was a fixed 300px, which only centered the image within a small box
+  // near the top of the screen rather than in the middle of the modal.
+  // `80vh` approximates the content area below the toolbar across
+  // platforms (iOS/MD toolbar heights differ slightly) without needing an
+  // exact `calc()` against a specific toolbar height.
+  min-height: 80vh;
 }
 
 img {

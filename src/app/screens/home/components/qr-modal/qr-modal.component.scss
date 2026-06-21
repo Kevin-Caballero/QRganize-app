@@ -1,5 +1,6 @@
 @media print {
   ion-header,
+  .layout-select,
   .qr-container button {
     display: none;
   }
@@ -14,6 +15,16 @@
   }
 }
 
+.qr-modal-content {
+  --background: var(--app-color-surface);
+}
+
+.layout-select {
+  --background: transparent;
+  --color: var(--app-color-ink);
+  grid-column: 1 / -1; // stays full-width even in the wide-screen grid below
+}
+
 .qr-container {
   display: flex;
   flex-direction: column;
@@ -21,12 +32,14 @@
   align-items: center;
   padding: 20px;
   page-break-inside: avoid;
+  background: var(--app-color-surface);
+  border-radius: var(--app-radius-md);
 
   .qr-name {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
-    color: var(--ion-color-dark);
+    color: var(--app-color-ink);
   }
 
   img {

@@ -7,7 +7,7 @@
   text-align: center;
   min-height: 400px;
   height: 70vh;
-  color: white;
+  color: var(--app-color-ink);
 }
 
 .empty-state .empty-icon {
@@ -77,77 +77,107 @@ ion-list {
   padding-bottom: 6rem;
 }
 
-.card {
-  border: 2px solid #7070ff;
-  width: 80%;
-  border-radius: 20px;
-  background: #1b233d;
-  padding: 5px;
+// `ion-item-sliding` is now the direct flex child of `ion-list` (the card
+// used to be); give it most of the available width (was 80%, left a lot of
+// dead space on either side) while keeping a small breathing margin, and
+// let the `ion-item.card` inside fill it.
+ion-item-sliding {
+  width: 95%;
+  border-radius: var(--app-radius-lg);
   overflow: hidden;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 20px 0px;
+  margin-bottom: var(--app-space-sm);
+
+  ion-item.card {
+    width: 100%;
+  }
+}
+
+// Spec 015: boxes moved from `ion-card` to `ion-item` (required by
+// `ion-item-sliding`'s swipe-to-reveal gesture, which only supports
+// `ion-item` children). These rules reset Ionic's default `ion-item`
+// chrome (host `--background`, internal padding/min-height, native inner
+// border) so the item reads identically to the former `.card`/
+// `.app-card--labeled` look -- nothing here is new visual design.
+ion-item.card {
+  --background: var(--app-color-surface);
+  --padding-start: 5px;
+  --padding-end: 5px;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --inner-padding-end: 0;
+  --inner-border-width: 0;
+  --min-height: unset;
+  --border-style: none;
+  border: 2px solid var(--app-card-border-color);
+  border-radius: var(--app-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--app-card-shadow);
   transition: all 0.2s ease;
+
+  &::part(native) {
+    padding: 0;
+  }
+
+  // Override the generic .app-card--labeled inline-start padding: this
+  // card already has its own (smaller) padding scheme, so only the
+  // shipping-label stripe (::before) is reused here, not the padding shift.
+  &.app-card--labeled {
+    padding-inline-start: 5px;
+  }
 
   &.selected {
     border-color: var(--ion-color-success);
-    box-shadow: 0 0 8px rgba(56, 128, 255, 0.5);
+    box-shadow: 0 0 8px rgba(255, 90, 54, 0.5);
+  }
+}
+
+.card-body {
+  width: 100%;
+}
+
+/* Header row: box name + status badge, in normal flow above the
+   image/gradient block -- replaces the old absolutely-positioned "envelope
+   flap" overlay, which broke once the badge needed real space. The badge
+   is a sibling of the title block (not nested/stacked under it) so it sits
+   at the top-right corner, level with the title, instead of below it. */
+.card .card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-space-sm);
+  padding: var(--app-space-sm) var(--app-space-sm) 0;
+
+  .app-badge {
+    flex-shrink: 0;
+  }
+}
+
+.card .card-header__title {
+  min-width: 0;
+  flex: 1;
+
+  .ellipsis-text {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--app-color-ink);
   }
 }
 
 .card .top-section {
-  height: 150px;
-  border-radius: 15px;
+  height: 110px;
+  border-radius: var(--app-radius-md);
+  margin: var(--app-space-xs) var(--app-space-sm) 0;
   display: flex;
   flex-direction: column;
   background: linear-gradient(
-    45deg,
-    rgb(4, 159, 187) 0%,
-    rgb(80, 246, 255) 100%
+    135deg,
+    var(--app-color-accent-primary) 0%,
+    var(--app-color-accent-secondary) 100%
   );
   position: relative;
-}
-
-.card .top-section .border {
-  border-bottom-right-radius: 10px;
-  height: 30px;
-  width: 240px;
-  background: white;
-  background: #1b233d;
-  position: relative;
-  transform: skew(-40deg);
-  box-shadow: -10px -10px 0 0 #1b233d;
-}
-
-.card .top-section .border::before {
-  content: "";
-  position: absolute;
-  width: 15px;
-  height: 15px;
-  top: 0;
-  right: -15px;
-  background: rgba(255, 255, 255, 0);
-  border-top-left-radius: 10px;
-  box-shadow: -5px -5px 0 2px #1b233d;
-}
-
-.card .top-section::before {
-  content: "";
-  position: absolute;
-  top: 30px;
-  left: 0;
-  background: rgba(255, 255, 255, 0);
-  height: 15px;
-  width: 15px;
-  border-top-left-radius: 15px;
-  box-shadow: -5px -5px 0 2px #1b233d;
-}
-
-.card .top-section .icons {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 30px;
-  display: flex;
-  justify-content: space-between;
 }
 
 .card .top-section .selection-indicator {
@@ -163,43 +193,6 @@ ion-list {
   }
 }
 
-.card .top-section .icons .logo {
-  height: 100%;
-  width: 70%;
-  padding: 3px 0 7px 15px;
-  color: white;
-  font-size: 1.2rem;
-
-  .ellipsis-text {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-
-.card .top-section .icons .logo .top-section {
-  height: 100%;
-}
-
-.card .top-section .icons .actions {
-  height: 100%;
-  padding: 5px;
-  display: flex;
-  color: white;
-  gap: 7px;
-}
-
-.card .top-section .icons .social-media .svg {
-  height: 100%;
-  fill: #1b233d;
-}
-
-.card .top-section .icons .social-media .svg:hover {
-  fill: white;
-}
-
 .card .bottom-section {
   margin-top: 15px;
   padding: 10px 5px;
@@ -208,7 +201,7 @@ ion-list {
 .card .bottom-section .title {
   display: block;
   font-weight: bolder;
-  color: white;
+  color: var(--app-color-ink);
   text-align: center;
   max-width: 100%;
   overflow: hidden;
@@ -216,24 +209,29 @@ ion-list {
   white-space: nowrap;
 }
 
+// Now a flex item inside `.item-properties` (was previously its own
+// full-width block above that row) -- no own margin-top, the parent row
+// already spaces itself from the title above; width comes from content
+// (flex items don't stretch to fill the row) instead of the full-bleed
+// pill it rendered as when it was a standalone block-level div.
 .card .bottom-section .checklist-badge {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-top: 10px;
   padding: 3px 8px;
-  background-color: rgba(90, 90, 255, 0.2);
+  background-color: rgba(45, 110, 126, 0.15);
   border-radius: 12px;
   font-size: 12px;
-  color: #a0a0ff;
+  color: var(--app-color-accent-secondary);
+  max-width: 100%;
 
   ion-icon {
     margin-right: 5px;
     font-size: 14px;
+    flex-shrink: 0;
   }
 
   span {
-    max-width: 80%;
+    max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -284,7 +282,11 @@ ion-list {
   flex: 30%;
   text-align: center;
   padding: 5px;
-  color: rgba(170, 222, 243, 0.721);
+  // Was a hardcoded light blue (rgba(170, 222, 243, 0.721)) tuned for a
+  // dark background only -- barely legible against the light theme's
+  // cream card surface. `--app-empty-state-color` already resolves to
+  // Ionic's theme-aware medium-gray token in both themes.
+  color: var(--app-empty-state-color);
 }
 
 .card .bottom-section .row .item .big-text {
@@ -297,6 +299,9 @@ ion-list {
 }
 
 .card .bottom-section .row .item:nth-child(2) {
-  border-left: 1px solid rgba(255, 255, 255, 0.126);
-  border-right: 1px solid rgba(255, 255, 255, 0.126);
+  // Was a hardcoded near-invisible white-based divider
+  // (rgba(255, 255, 255, 0.126)), tuned for a dark background only.
+  // `--app-card-border-color` already adapts between light/dark themes.
+  border-left: 1px solid var(--app-card-border-color);
+  border-right: 1px solid var(--app-card-border-color);
 }

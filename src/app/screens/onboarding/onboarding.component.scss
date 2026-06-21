@@ -8,9 +8,59 @@
 swiper-container {
   height: 100%;
   padding: 2em;
+  --background: var(--app-color-bg);
 }
 
 img {
   width: 100%;
   height: 350px;
+}
+
+swiper-slide {
+  h2 {
+    margin-top: var(--app-space-lg);
+    margin-bottom: var(--app-space-sm);
+
+    .accent {
+      color: var(--app-color-accent-primary);
+    }
+  }
+
+  p {
+    margin: 0 var(--app-space-sm);
+  }
+
+  ion-button {
+    margin-top: var(--app-space-lg);
+    min-height: 44px;
+  }
+
+  .secondary-action {
+    --color: var(--app-color-accent-secondary);
+    margin-top: var(--app-space-sm);
+  }
+}
+
+ion-footer {
+  ion-toolbar {
+    --background: var(--app-color-bg);
+  }
+
+  ion-button {
+    min-height: 44px;
+  }
+
+  .skip-action {
+    color: var(--app-color-accent-secondary);
+  }
+
+  .next-action {
+    color: var(--app-color-accent-primary);
+    font-weight: 600;
+  }
+
+  .onboarding-progress {
+    --progress-background: var(--app-color-accent-primary);
+    margin: 0 var(--app-space-sm);
+  }
 }

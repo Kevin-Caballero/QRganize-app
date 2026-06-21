@@ -1,23 +1,42 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="start">
+    <ion-buttons slot="start" *ngIf="step === 'box'">
       <ion-button color="medium" (click)="cancel()">Cancel</ion-button>
     </ion-buttons>
-    <ion-title>{{ isEditMode ? "Edit Box" : "New Box" }}</ion-title>
+    <ion-title class="app-text-h1">
+      {{
+        step === "items"
+          ? "Add Items"
+          : isEditMode
+          ? "Edit Box"
+          : "New Box"
+      }}
+    </ion-title>
     <ion-buttons slot="end">
       <ion-button
+        *ngIf="step === 'box'"
         (click)="confirm()"
         [disabled]="boxForm.invalid"
         [strong]="true"
+        class="app-primary-action"
         >Confirm</ion-button
+      >
+      <ion-button
+        *ngIf="step === 'items'"
+        (click)="done()"
+        [strong]="true"
+        class="app-primary-action"
+        >Done</ion-button
       >
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content class="ion-padding">
-  <div class="container">
+<ion-content class="ion-padding box-modal-content">
+  <div class="container" *ngIf="step === 'box'">
     <div class="box-form">
-      <H3>{{ isEditMode ? "Edit" : "Create a" }} <b>Box</b></H3>
+      <h3 class="app-text-h2">
+        {{ isEditMode ? "Edit" : "Create a" }} <b>Box</b>
+      </h3>
       <form [formGroup]="boxForm">
         <ion-item>
           <ion-input
@@ -78,28 +97,58 @@
           <ion-button
             fill="outline"
             class="file-button"
-            (click)="fileInput.click()"
-            *ngIf="!selectedFileName"
+            (click)="takePicture()"
+            *ngIf="!imagePreview"
           >
-            <ion-icon slot="start" name="image-outline"></ion-icon>
-            Choose file
+            <ion-icon slot="start" name="camera-outline"></ion-icon>
+            Take Photo
           </ion-button>
-          <div class="file-info" *ngIf="selectedFileName">
-            <div id="click-trigger" class="file-name">
-              {{ selectedFileName }}
+
+          <div class="file-info" *ngIf="imagePreview">
+            <div class="file-name">
+              {{ selectedFileName || "Photo selected" }}
             </div>
-            <ion-popover trigger="click-trigger" triggerAction="click">
-              <ng-template>
-                <ion-content class="ion-padding">{{
-                  selectedFileName
-                }}</ion-content>
-              </ng-template>
-            </ion-popover>
-            <ion-button fill="clear" (click)="changeFile()">
+            <ion-button fill="clear" (click)="takePicture()">
               <ion-icon slot="start" name="refresh-outline"></ion-icon>
               Change
             </ion-button>
           </div>
+        </ion-item>
+
+        <div class="image-preview-container" *ngIf="imagePreview">
+          <img [src]="imagePreview" alt="Selected box image preview" />
+        </div>
+
+        <!-- Room Selection -->
+        <ion-item>
+          <ion-select
+            labelPlacement="stacked"
+            label="Room"
+            formControlName="room"
+            placeholder="Select a room"
+            interface="popover"
+            (ionChange)="onRoomChange()"
+          >
+            <ion-icon slot="start" name="home-outline"></ion-icon>
+            <ion-select-option
+              *ngFor="let roomOption of roomOptions"
+              [value]="roomOption"
+            >
+              {{ roomOption }}
+            </ion-select-option>
+            <ion-select-option value="Other">Other</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item *ngIf="isOtherRoomSelected">
+          <ion-input
+            labelPlacement="stacked"
+            label="Room name"
+            formControlName="roomOther"
+            placeholder="e.g. Attic"
+          >
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+          </ion-input>
         </ion-item>
 
         <!-- Checklist Selection -->
@@ -117,7 +166,7 @@
               *ngFor="let checklist of availableChecklists"
               [value]="checklist.id"
             >
-              {{ checklist.name }}
+              {{ checklist.title }}
             </ion-select-option>
           </ion-select>
           <ion-note *ngIf="isLoadingChecklists">Loading checklists...</ion-note>
@@ -129,28 +178,111 @@
         </ion-item>
       </form>
     </div>
+  </div>
 
-    <ion-card *ngIf="boxForm">
-      <ion-card-header>
-        <ion-card-title>
-          {{ boxForm.get("name")?.value || "Your box name" }}
-        </ion-card-title>
-        <ion-card-subtitle>
-          {{ boxForm.value.description || "Some description..." }}
-        </ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <div class="image-container">
-          <img
-            *ngIf="selectedImageUrl; else placeholder"
-            [src]="selectedImageUrl"
-            alt="Box preview"
-          />
-          <ng-template #placeholder>
-            <div class="placeholder-text">No image selected</div>
-          </ng-template>
+  <!-- Add-items sub-step (Spec 009 Step 4): consolidated create + add-items
+       flow, reusing item-modal.component.ts's field set inlined as a second
+       step of this same modal instance, instead of a separate modal. -->
+  <div class="container" *ngIf="step === 'items'">
+    <div class="box-form item-step">
+      <h3 class="app-text-h2">
+        Add items to <b>{{ createdBox?.name }}</b>
+      </h3>
+      <p class="app-text-caption">
+        Add as many items as you like, then tap Done.
+      </p>
+
+      <form [formGroup]="itemForm">
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Name"
+            formControlName="name"
+            placeholder="Glass cup"
+          >
+            <ion-icon slot="start" name="cube-outline"></ion-icon>
+          </ion-input>
+        </ion-item>
+        <ion-note
+          [style.visibility]="
+            itemForm.get('name')?.invalid && itemForm.get('name')?.touched
+              ? 'visible'
+              : 'hidden'
+          "
+          color="danger"
+        >
+          {{ itemNameError || "." }}
+        </ion-note>
+
+        <ion-item>
+          <ion-input
+            labelPlacement="stacked"
+            label="Quantity"
+            formControlName="quantity"
+            placeholder="1"
+            type="number"
+            min="1"
+            max="9999"
+          >
+            <ion-icon slot="start" name="layers-outline"></ion-icon>
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-checkbox formControlName="isFragile" justify="space-between">
+            <ion-icon slot="start" name="warning-outline"></ion-icon>
+            Fragile Item
+          </ion-checkbox>
+        </ion-item>
+
+        <ion-item>
+          <ion-checkbox
+            formControlName="expires"
+            justify="space-between"
+            (ionChange)="onExpiresChange()"
+          >
+            <ion-icon slot="start" name="time-outline"></ion-icon>
+            Item Expires
+          </ion-checkbox>
+        </ion-item>
+
+        <div *ngIf="itemForm.get('expires')?.value" class="expiration-section">
+          <ion-item>
+            <ion-label position="stacked">Expiration Date</ion-label>
+            <ion-datetime
+              formControlName="expirationDate"
+              presentation="date"
+              [showDefaultButtons]="false"
+              class="inline-datetime"
+            >
+            </ion-datetime>
+          </ion-item>
         </div>
-      </ion-card-content>
-    </ion-card>
+
+        <ion-button
+          expand="block"
+          class="app-primary-action add-item-button"
+          [disabled]="itemForm.invalid || isAddingItem"
+          (click)="addItem()"
+        >
+          <ion-icon slot="start" name="add-outline"></ion-icon>
+          Add item
+        </ion-button>
+      </form>
+    </div>
+
+    <div class="added-items" *ngIf="addedItems.length > 0">
+      <p class="app-text-caption">
+        {{ addedItems.length }}
+        {{ addedItems.length === 1 ? "item" : "items" }} added
+      </p>
+      <ion-list>
+        <ion-item *ngFor="let addedItem of addedItems" lines="full">
+          <ion-icon slot="start" name="cube-outline"></ion-icon>
+          <ion-label>{{ addedItem.name }}</ion-label>
+          <ion-note slot="end">x{{ addedItem.quantity }}</ion-note>
+        </ion-item>
+      </ion-list>
+    </div>
   </div>
 </ion-content>

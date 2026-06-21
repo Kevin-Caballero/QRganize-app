@@ -1,3 +1,5 @@
+/// <reference types="@capacitor-firebase/authentication" />
+
 import { CapacitorConfig } from '@capacitor/cli';
 import { KeyboardResize } from '@capacitor/keyboard';
 
@@ -19,6 +21,16 @@ const config: CapacitorConfig = {
     },
     Keyboard: {
       resize: KeyboardResize.None,
+    },
+    // Spec 010: mandatory Firebase Authentication gate.
+    // `providers: ["google.com"]` loads the Google sign-in provider on the
+    // native layer (Android/iOS); email/password needs no provider entry.
+    // `skipNativeAuth: false` (the default) is kept so native Google
+    // sign-in goes through the native Firebase/Google SDKs, not a web-only
+    // OAuth popup, per Spec 010's acceptance criteria.
+    FirebaseAuthentication: {
+      skipNativeAuth: false,
+      providers: ['google.com'],
     },
   },
   android: {

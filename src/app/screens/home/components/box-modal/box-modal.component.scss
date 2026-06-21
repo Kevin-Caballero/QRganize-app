@@ -1,3 +1,7 @@
+.box-modal-content {
+  --background: var(--app-color-bg);
+}
+
 .container {
   display: flex;
   margin: 0 auto;
@@ -10,9 +14,9 @@
 
   .box-form {
     padding: 1rem;
-    border-radius: 10px;
-    background: rgba(136, 152, 235, 0.3);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: var(--app-radius-md);
+    background: var(--app-color-surface);
+    box-shadow: var(--app-card-shadow);
 
     ion-item {
       margin-top: 16px;
@@ -39,35 +43,41 @@
         font-size: 0.95rem;
       }
     }
+
+    .image-preview-container {
+      margin-top: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+
+      img {
+        max-width: 200px;
+        max-height: 150px;
+        object-fit: cover;
+        border-radius: var(--app-radius-sm);
+        border: 2px solid var(--app-card-border-color);
+      }
+    }
   }
 
-  .image-container {
-    height: 200px;
-    width: 100%;
-    border-radius: 8px;
-    background-color: #2a2a2a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+  .item-step {
+    .add-item-button {
+      margin-top: 16px;
+      min-height: 44px;
+    }
   }
 
-  .image-container img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover;
-  }
-
-  .placeholder-text {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    text-align: center;
-    color: #ccc;
-  }
-
-  ion-card-header,
-  ion-card-title,
-  ion-card-subtitle {
+  .added-items {
+    margin-top: 1rem;
     text-align: left;
+
+    ion-list {
+      border-radius: var(--app-radius-md);
+      overflow: hidden;
+    }
+
+    ion-item {
+      --min-height: 44px;
+    }
   }
 }

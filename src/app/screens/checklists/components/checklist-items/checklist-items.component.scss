@@ -2,13 +2,24 @@
   padding: 16px;
 }
 
-// Force dark background for all cards in this component
-ion-card {
-  background: #222428 !important;
+.image-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
 
-  ion-card-content {
-    background: #222428 !important;
+  .item-image-preview {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
   }
+}
+
+.item-quantity {
+  font-size: 13px;
+  color: var(--ion-color-medium);
+  font-weight: 500;
 }
 
 .header-section {
@@ -22,7 +33,7 @@ ion-card {
 
     .progress-text {
       font-size: 14px;
-      color: #cccccc !important;
+      color: var(--app-empty-state-color) !important;
       font-weight: 500;
     }
 
@@ -45,22 +56,14 @@ ion-card {
 
 .item-card {
   margin-bottom: 8px;
-  border-radius: 12px;
   transition: all 0.3s ease;
-  background: #222428 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
   ion-card-content {
-    background: #222428 !important;
     padding: 12px;
   }
 
   &.completed {
     opacity: 0.7;
-
-    ion-card-content {
-      background: #1e2023 !important;
-    }
   }
 }
 
@@ -79,7 +82,7 @@ ion-card {
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--app-card-shadow);
     }
 
     ion-icon {
@@ -126,6 +129,11 @@ ion-card {
     flex-shrink: 0;
     --size: 24px;
     --checkmark-width: 3px;
+
+    &.item-checkbox--completed {
+      --background-checked: var(--app-color-success);
+      --border-color-checked: var(--app-color-success);
+    }
   }
 
   .item-image {
@@ -135,8 +143,8 @@ ion-card {
     border-radius: 8px;
     overflow: hidden;
     flex-shrink: 0;
-    border: 2px solid var(--ion-color-primary);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid var(--app-color-accent-primary);
+    box-shadow: var(--app-card-shadow);
     transition: transform 0.2s ease;
     cursor: pointer;
 
@@ -158,19 +166,19 @@ ion-card {
     .item-name {
       font-size: 16px;
       font-weight: 600;
-      color: #ffffff !important;
+      color: var(--app-color-ink) !important;
       margin-bottom: 4px;
       transition: all 0.3s ease;
 
       &.strikethrough {
         text-decoration: line-through;
-        color: #888888 !important;
+        color: var(--app-color-success) !important;
       }
     }
 
     .item-description {
       font-size: 14px;
-      color: #cccccc !important;
+      color: var(--app-empty-state-color) !important;
       line-height: 1.4;
     }
 
@@ -209,35 +217,6 @@ ion-card {
   }
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px 20px;
-  text-align: center;
-
-  .empty-icon {
-    font-size: 60px;
-    color: #888888 !important;
-    margin-bottom: 16px;
-  }
-
-  h3 {
-    color: #ffffff !important;
-    margin-bottom: 8px;
-    font-size: 18px;
-    font-weight: 600;
-  }
-
-  p {
-    color: #cccccc !important;
-    margin-bottom: 0;
-    font-size: 14px;
-    line-height: 1.4;
-  }
-}
-
 .add-item-section {
   margin-top: 20px;
 
@@ -245,9 +224,6 @@ ion-card {
     height: 48px;
     font-size: 16px;
     font-weight: 500;
-    --border-width: 2px;
-    --border-color: var(--ion-color-primary);
-    --color: var(--ion-color-primary);
 
     ion-icon {
       font-size: 20px;
@@ -295,28 +271,11 @@ ion-card {
   }
 }
 
-// Dark mode support - simplified and forced
-@media (prefers-color-scheme: dark) {
-  .item-card {
-    background: #222428 !important;
-
-    ion-card-content {
-      background: #222428 !important;
-    }
-
-    &.completed {
-      ion-card-content {
-        background: #1e2023 !important;
-      }
-    }
-  }
-}
-
 // Editing mode styles
 .item-card {
   &.editing {
-    border: 2px solid var(--ion-color-primary);
-    box-shadow: 0 8px 25px rgba(var(--ion-color-primary-rgb), 0.15);
+    border: 2px solid var(--app-color-accent-secondary);
+    box-shadow: var(--app-card-shadow);
   }
 
   .edit-mode {
@@ -337,14 +296,14 @@ ion-card {
         margin-bottom: 4px;
 
         .name-input {
-          --color: #ffffff !important;
+          --color: var(--app-color-ink) !important;
           --placeholder-color: var(--ion-color-medium);
-          color: #ffffff !important;
+          color: var(--app-color-ink) !important;
         }
 
         ion-input {
-          --color: #ffffff !important;
-          color: #ffffff !important;
+          --color: var(--app-color-ink) !important;
+          color: var(--app-color-ink) !important;
         }
       }
 
@@ -359,16 +318,16 @@ ion-card {
           flex-wrap: wrap;
 
           .property-tag {
-            --background: rgba(255, 255, 255, 0.05);
+            --background: var(--app-card-background);
             --color: var(--ion-color-medium);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--app-card-border-color);
             cursor: pointer;
             transition: all 0.3s ease;
             height: 36px;
             border-radius: 18px;
 
             &:hover {
-              --background: rgba(255, 255, 255, 0.1);
+              --background: var(--app-card-border-color);
               transform: translateY(-1px);
             }
 
@@ -398,7 +357,7 @@ ion-card {
               .date-preview {
                 margin-left: 8px;
                 padding: 2px 6px;
-                background: rgba(255, 255, 255, 0.1);
+                background: var(--app-card-border-color);
                 border-radius: 4px;
                 font-size: 12px;
                 font-weight: 500;
@@ -443,7 +402,7 @@ ion-card {
           }
 
           ion-datetime {
-            --color: var(--ion-color-light);
+            --color: var(--app-color-ink);
             font-size: 14px;
           }
         }
@@ -455,10 +414,10 @@ ion-card {
         gap: 8px;
         margin-top: 8px;
         padding-top: 8px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid var(--app-card-border-color);
 
         ion-button {
-          --border-radius: 6px;
+          --border-radius: var(--app-radius-sm);
           font-size: 14px;
           height: 32px;
         }
@@ -523,11 +482,11 @@ ion-card {
 
   .modal-datetime {
     --background: transparent;
-    --color: var(--ion-color-light);
-    border-radius: 12px;
+    --color: var(--app-color-ink);
+    border-radius: var(--app-radius-md);
     padding: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--app-card-background);
+    border: 1px solid var(--app-card-border-color);
   }
 
   .date-actions {
@@ -536,17 +495,17 @@ ion-card {
     gap: 12px;
 
     ion-button {
-      --border-radius: 8px;
+      --border-radius: var(--app-radius-sm);
       height: 44px;
       font-weight: 500;
 
       &[fill="clear"] {
         --color: var(--ion-color-medium);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--app-card-border-color);
 
         &:hover {
-          --color: var(--ion-color-light);
-          --background: rgba(255, 255, 255, 0.05);
+          --color: var(--app-color-ink);
+          --background: var(--app-card-border-color);
         }
       }
 
@@ -568,20 +527,20 @@ ion-card {
     --backdrop-opacity: 0.6;
 
     .alert-wrapper {
-      --background: #1e1e1e;
-      --color: #ffffff;
-      border-radius: 16px;
+      --background: var(--app-overlay-background);
+      --color: var(--app-overlay-color);
+      border-radius: var(--app-radius-lg);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--app-overlay-border-color);
       max-width: 320px;
     }
 
     .alert-head {
       padding: 24px 24px 16px 24px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid var(--app-overlay-border-color);
 
       .alert-title {
-        color: #ffffff;
+        color: var(--app-overlay-color);
         font-size: 20px;
         font-weight: 600;
         text-align: center;
@@ -589,7 +548,7 @@ ion-card {
       }
 
       .alert-sub-title {
-        color: #b0b0b0;
+        color: var(--app-empty-state-color);
         font-size: 14px;
         text-align: center;
         margin: 8px 0 0 0;
@@ -609,11 +568,11 @@ ion-card {
       padding: 8px 24px 24px 24px;
 
       .alert-input {
-        background: #2a2a2a !important;
-        border: 1px solid #444 !important;
-        border-radius: 8px !important;
+        background: var(--app-overlay-background-tint) !important;
+        border: 1px solid var(--app-overlay-border-color) !important;
+        border-radius: var(--app-radius-sm) !important;
         padding: 12px !important;
-        color: #ffffff !important;
+        color: var(--app-overlay-color) !important;
         font-size: 16px !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -629,7 +588,7 @@ ion-card {
 
     .alert-button-group {
       padding: 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid var(--app-overlay-border-color);
       display: flex;
       flex-direction: column;
       gap: 0;
@@ -638,7 +597,7 @@ ion-card {
         margin: 0;
         border-radius: 0;
         border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid var(--app-overlay-border-color);
         min-height: 48px;
         font-size: 16px;
         font-weight: 500;
@@ -646,12 +605,12 @@ ion-card {
 
         &:last-child {
           border-bottom: none;
-          border-bottom-left-radius: 16px;
-          border-bottom-right-radius: 16px;
+          border-bottom-left-radius: var(--app-radius-lg);
+          border-bottom-right-radius: var(--app-radius-lg);
         }
 
         &:first-child:last-child {
-          border-radius: 0 0 16px 16px;
+          border-radius: 0 0 var(--app-radius-lg) var(--app-radius-lg);
         }
 
         &.alert-button-clear {
@@ -664,12 +623,12 @@ ion-card {
         }
 
         &.alert-button-cancel {
-          background: rgba(255, 255, 255, 0.05);
-          color: #b0b0b0;
+          background: var(--app-overlay-background-tint);
+          color: var(--app-empty-state-color);
 
           &:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #ffffff;
+            background: var(--app-overlay-border-color);
+            color: var(--app-overlay-color);
           }
         }
 
@@ -703,7 +662,7 @@ ion-card {
 
   .inline-datetime {
     --background: transparent;
-    --color: #ffffff;
+    --color: var(--app-color-ink);
     --color-selected: var(--ion-color-primary);
     --background-selected: rgba(var(--ion-color-primary-rgb), 0.2);
     --padding-top: 4px;
@@ -733,8 +692,8 @@ ion-card {
     --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
 
     .modal-wrapper {
-      background: #1e1e1e;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--app-overlay-background);
+      border: 1px solid var(--app-overlay-border-color);
     }
 
     ion-header ion-toolbar {
@@ -743,7 +702,7 @@ ion-card {
     }
 
     ion-content {
-      --background: #121212;
+      --background: var(--app-overlay-background);
     }
   }
 }
@@ -774,14 +733,14 @@ ion-card {
       margin-bottom: 4px;
 
       .name-input {
-        --color: #ffffff !important;
+        --color: var(--app-color-ink) !important;
         --placeholder-color: var(--ion-color-medium);
-        color: #ffffff !important;
+        color: var(--app-color-ink) !important;
       }
 
       ion-input {
-        --color: #ffffff !important;
-        color: #ffffff !important;
+        --color: var(--app-color-ink) !important;
+        color: var(--app-color-ink) !important;
       }
     }
 
@@ -796,16 +755,16 @@ ion-card {
         flex-wrap: wrap;
 
         .property-tag {
-          --background: rgba(255, 255, 255, 0.05);
+          --background: var(--app-card-background);
           --color: var(--ion-color-medium);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid var(--app-card-border-color);
           cursor: pointer;
           transition: all 0.3s ease;
           height: 36px;
           border-radius: 18px;
 
           &:hover {
-            --background: rgba(255, 255, 255, 0.1);
+            --background: var(--app-card-border-color);
             transform: translateY(-1px);
           }
 
@@ -835,7 +794,7 @@ ion-card {
             .date-preview {
               margin-left: 8px;
               padding: 2px 6px;
-              background: rgba(255, 255, 255, 0.1);
+              background: var(--app-card-border-color);
               border-radius: 4px;
               font-size: 12px;
               font-weight: 500;
@@ -867,7 +826,7 @@ ion-card {
 
         .inline-datetime {
           --background: transparent;
-          --color: #ffffff;
+          --color: var(--app-color-ink);
           --color-selected: var(--ion-color-primary);
           --background-selected: rgba(var(--ion-color-primary-rgb), 0.2);
           --padding-top: 4px;
@@ -884,10 +843,10 @@ ion-card {
       gap: 8px;
       margin-top: 8px;
       padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid var(--app-card-border-color);
 
       ion-button {
-        --border-radius: 6px;
+        --border-radius: var(--app-radius-sm);
         font-size: 14px;
         height: 32px;
       }

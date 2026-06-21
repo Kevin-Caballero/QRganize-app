@@ -4,17 +4,17 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding app-page">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Settings</ion-title>
+      <ion-title size="large" class="app-text-h1">Settings</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <!-- Account Summary -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>
+      <ion-card-title class="app-text-h2">
         <ion-icon name="stats-chart-outline" class="section-icon"></ion-icon>
         Account Summary
       </ion-card-title>
@@ -22,31 +22,33 @@
     <ion-card-content>
       <ion-grid>
         <ion-row *ngIf="isLoadingStats">
-          <ion-col size="12" class="ion-text-center">
-            <ion-spinner name="circular"></ion-spinner>
-            <p>Loading statistics...</p>
+          <ion-col size="12">
+            <div class="app-loading-state">
+              <ion-spinner name="circular"></ion-spinner>
+              <p>Loading statistics...</p>
+            </div>
           </ion-col>
         </ion-row>
         <ion-row *ngIf="!isLoadingStats">
           <ion-col size="4">
             <div class="stat-box">
               <ion-icon name="cube-outline"></ion-icon>
-              <div class="stat-count">{{ boxesCount }}</div>
-              <div class="stat-label">Boxes</div>
+              <div class="stat-count app-text-mono">{{ boxesCount }}</div>
+              <div class="stat-label app-text-caption">Boxes</div>
             </div>
           </ion-col>
           <ion-col size="4">
             <div class="stat-box">
               <ion-icon name="list-outline"></ion-icon>
-              <div class="stat-count">{{ checklistsCount }}</div>
-              <div class="stat-label">Checklists</div>
+              <div class="stat-count app-text-mono">{{ checklistsCount }}</div>
+              <div class="stat-label app-text-caption">Checklists</div>
             </div>
           </ion-col>
           <ion-col size="4">
             <div class="stat-box">
               <ion-icon name="pricetag-outline"></ion-icon>
-              <div class="stat-count">{{ itemsCount }}</div>
-              <div class="stat-label">Items</div>
+              <div class="stat-count app-text-mono">{{ itemsCount }}</div>
+              <div class="stat-label app-text-caption">Items</div>
             </div>
           </ion-col>
         </ion-row>
@@ -57,23 +59,24 @@
   <!-- Appearance -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>
+      <ion-card-title class="app-text-h2">
         <ion-icon name="color-palette-outline" class="section-icon"></ion-icon>
         Appearance
       </ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-item>
-        <ion-icon name="text-outline" slot="start"></ion-icon>
-        <ion-label>Font Size</ion-label>
+        <ion-icon name="contrast-outline" slot="start"></ion-icon>
+        <ion-label>Theme</ion-label>
         <ion-select
-          [(ngModel)]="fontSize"
-          (ionChange)="changeFontSize()"
+          slot="end"
+          [(ngModel)]="theme"
+          (ionChange)="changeTheme()"
           interface="popover"
         >
-          <ion-select-option value="small">Small</ion-select-option>
-          <ion-select-option value="medium">Medium</ion-select-option>
-          <ion-select-option value="large">Large</ion-select-option>
+          <ion-select-option value="light">Light</ion-select-option>
+          <ion-select-option value="dark">Dark</ion-select-option>
+          <ion-select-option value="system">System</ion-select-option>
         </ion-select>
       </ion-item>
     </ion-card-content>
@@ -82,7 +85,7 @@
   <!-- Notifications -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>
+      <ion-card-title class="app-text-h2">
         <ion-icon name="notifications-outline" class="section-icon"></ion-icon>
         Notifications
       </ion-card-title>
@@ -93,15 +96,16 @@
         <ion-label>Expiration Reminders</ion-label>
         <ion-toggle
           [(ngModel)]="expirationReminders"
-          (ionChange)="updateNotificationSettings()"
+          (ionChange)="onExpirationRemindersChange()"
         ></ion-toggle>
       </ion-item>
       <ion-item>
         <ion-icon name="time-outline" slot="start"></ion-icon>
         <ion-label>Reminder Time</ion-label>
         <ion-select
+          slot="end"
           [(ngModel)]="reminderDays"
-          (ionChange)="updateNotificationSettings()"
+          (ionChange)="onReminderDaysChange()"
           interface="popover"
         >
           <ion-select-option value="1">1 day before</ion-select-option>
@@ -116,7 +120,7 @@
   <!-- More Options -->
   <ion-card>
     <ion-card-header>
-      <ion-card-title>
+      <ion-card-title class="app-text-h2">
         <ion-icon name="settings-outline" class="section-icon"></ion-icon>
         More Options
       </ion-card-title>
@@ -136,7 +140,8 @@
 
   <ion-button
     expand="block"
-    class="logout-button ion-margin-top ion-margin-bottom"
+    color="danger"
+    class="app-primary-action logout-button ion-margin-top ion-margin-bottom"
     (click)="logout()"
   >
     <ion-icon name="log-out-outline" slot="start"></ion-icon>

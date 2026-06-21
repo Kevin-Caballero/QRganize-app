@@ -3,11 +3,12 @@
     <ion-buttons slot="start">
       <ion-button color="medium" (click)="dismiss()"> CANCEL </ion-button>
     </ion-buttons>
-    <ion-title>New Checklist</ion-title>
+    <ion-title class="app-text-h1">{{ isEditMode ? 'Edit Checklist' : 'New Checklist' }}</ion-title>
     <ion-buttons slot="end">
       <ion-button
+        class="app-primary-action"
         (click)="save()"
-        [disabled]="!checklistName?.trim() || loading"
+        [disabled]="!title?.trim() || loading"
         [strong]="true"
       >
         SAVE
@@ -19,14 +20,14 @@
 <ion-content class="ion-padding">
   <div class="container">
     <div class="checklist-form">
-      <H3>Create a <b>Checklist</b></H3>
+      <h3 class="app-text-h2">{{ isEditMode ? 'Edit' : 'Create a' }} <b>Checklist</b></h3>
 
-      <!-- Checklist Name -->
+      <!-- Checklist Title -->
       <ion-item>
         <ion-input
           labelPlacement="stacked"
-          label="Name"
-          [(ngModel)]="checklistName"
+          label="Title"
+          [(ngModel)]="title"
           placeholder="Bedroom stuff"
           required
         >
@@ -34,182 +35,39 @@
         </ion-input>
       </ion-item>
       <ion-note
-        [style.visibility]="!checklistName?.trim() ? 'visible' : 'hidden'"
+        [class.ion-hide]="title?.trim()"
         color="danger"
       >
-        Please enter a checklist name
+        Please enter a checklist title
       </ion-note>
 
-      <!-- Box Selection -->
-      <div
-        class="box-selection-wrapper"
-        [class.disabled]="availableBoxes.length === 0"
-      >
-        <ion-item>
-          <ion-select
-            labelPlacement="stacked"
-            label="Box (Optional)"
-            [(ngModel)]="selectedBoxId"
-            [placeholder]="
-              availableBoxes.length > 0
-                ? 'Select a box for this checklist'
-                : 'No boxes available'
-            "
-            [disabled]="availableBoxes.length === 0"
-            interface="popover"
-          >
-            <ion-icon slot="start" name="cube-outline"></ion-icon>
-            <ion-select-option
-              *ngFor="let box of availableBoxes"
-              [value]="box.id"
-            >
-              {{ box.name }}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
+      <!-- Checklist Description -->
+      <ion-item>
+        <ion-textarea
+          labelPlacement="stacked"
+          label="Description (optional)"
+          [(ngModel)]="description"
+          placeholder="What is this checklist for?"
+          autoGrow="true"
+        >
+        </ion-textarea>
+      </ion-item>
 
-        <!-- Overlay for disabled state -->
-        <div
-          *ngIf="availableBoxes.length === 0"
-          class="disabled-overlay"
-          (click)="onBoxSelectClick()"
-        ></div>
-      </div>
-
-      <!-- Items Section -->
-      <div class="items-section">
-        <div class="section-header">
-          <h4>Items to pack</h4>
-          <ion-button fill="clear" size="small" (click)="addNewItem()">
-            <ion-icon name="add" slot="start"></ion-icon>
-            Add Item
-          </ion-button>
-        </div>
-
-        <!-- Items List -->
-        <div class="items-list" *ngIf="items.length > 0">
-          <ion-card
-            *ngFor="let item of items; let i = index"
-            class="item-card"
-            [class.editing]="editingItemIndex === i"
-          >
-            <ion-card-content>
-              <!-- Editing Mode -->
-              <div *ngIf="editingItemIndex === i" class="edit-mode">
-                <app-item-form
-                  [initialData]="{
-                    name: tempItem.name,
-                    quantity: tempItem.quantity || 1,
-                    fragile: tempItem.isFragile,
-                    expires: tempItem.expires,
-                    expirationDate: tempItem.expirationDate?.toISOString()
-                  }"
-                  saveButtonText="Save"
-                  cancelButtonText="Cancel"
-                  [showQuantity]="true"
-                  [showImage]="true"
-                  (save)="onItemFormSave($event)"
-                  (cancel)="cancelEdit()"
-                >
-                </app-item-form>
-              </div>
-
-              <!-- View Mode -->
-              <div *ngIf="editingItemIndex !== i" class="view-mode">
-                <!-- Tags en la parte superior -->
-                <div
-                  class="item-tags-top"
-                  *ngIf="
-                    item.isFragile ||
-                    (item.expires && item.expirationDate) ||
-                    item.imageUrl
-                  "
-                >
-                  <ion-chip
-                    *ngIf="item.isFragile"
-                    color="warning"
-                    size="small"
-                    class="property-chip"
-                  >
-                    <ion-icon name="warning" size="small"></ion-icon>
-                    <ion-label>Fragile</ion-label>
-                  </ion-chip>
-                  <ion-chip
-                    *ngIf="item.expires && item.expirationDate"
-                    color="danger"
-                    size="small"
-                    class="property-chip"
-                  >
-                    <ion-icon name="time" size="small"></ion-icon>
-                    <ion-label>
-                      Expires: {{ formatDate(item.expirationDate) }}
-                    </ion-label>
-                  </ion-chip>
-                  <ion-chip
-                    *ngIf="item.imageUrl"
-                    color="tertiary"
-                    size="small"
-                    class="property-chip view-photo-chip"
-                    (click)="openImageModal(item.imageUrl)"
-                  >
-                    <ion-icon name="image" size="small"></ion-icon>
-                    <ion-label>Photo</ion-label>
-                    <ion-icon name="eye-outline" size="small"></ion-icon>
-                  </ion-chip>
-                </div>
-
-                <div class="item-content">
-                  <ion-checkbox
-                    [checked]="item.isCompleted"
-                    (ionChange)="toggleItem(i)"
-                    class="item-checkbox"
-                  >
-                  </ion-checkbox>
-
-                  <div class="item-info" (click)="toggleItem(i)">
-                    <div
-                      class="item-name"
-                      [class.strikethrough]="item.isCompleted"
-                    >
-                      {{ item.name }}
-                    </div>
-                  </div>
-
-                  <div class="item-actions">
-                    <ion-button fill="clear" size="small" (click)="editItem(i)">
-                      <ion-icon name="create" slot="icon-only"></ion-icon>
-                    </ion-button>
-                    <ion-button
-                      fill="clear"
-                      size="small"
-                      color="danger"
-                      (click)="removeItem(i)"
-                    >
-                      <ion-icon name="trash" slot="icon-only"></ion-icon>
-                    </ion-button>
-                  </div>
-                </div>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </div>
-
-        <!-- Empty Items State -->
-        <div class="empty-items" *ngIf="items.length === 0">
-          <ion-icon name="list-outline" class="empty-icon"></ion-icon>
-          <p>No items added yet. Start adding items to pack!</p>
-        </div>
-
-        <!-- Progress -->
-        <div class="progress-section" *ngIf="items.length > 0">
-          <div class="progress-text">
-            {{ getCompletedCount() }} of {{ items.length }} items packed
-          </div>
-          <ion-progress-bar
-            [value]="getProgressPercentage()"
-          ></ion-progress-bar>
-        </div>
-      </div>
+      <!-- Box Assignment -->
+      <ion-item>
+        <ion-select
+          labelPlacement="stacked"
+          label="Assign to box (optional)"
+          [(ngModel)]="boxId"
+          placeholder="No box"
+          interface="popover"
+        >
+          <ion-select-option [value]="null" class="app-text-body">No box</ion-select-option>
+          <ion-select-option *ngFor="let box of boxes" [value]="box.id" class="app-text-body">
+            {{ box.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
     </div>
   </div>
 </ion-content>

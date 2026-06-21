@@ -1,46 +1,54 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import {
-  Checklist,
-  ChecklistItem,
-} from '../../../../shared/interfaces/checklist.interface';
-import { ChecklistService } from '../../../../shared/services/checklist.service';
-import { ToastService } from '../../../../shared/services/toast.service';
-import { ItemFormData } from '../../../../shared/components/item-form/item-form.component';
-import { ModalController } from '@ionic/angular';
-import { environment } from 'src/environments/environment';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { ModalController, Platform } from '@ionic/angular';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { LocalChecklistsService } from '../../../../shared/services/local-checklists.service';
+import { LocalChecklistItem } from '../../../../shared/models/local-checklist';
 import { ImageModalComponent } from '../../../../components/image-modal/image-modal.component';
 
+/**
+ * Checklist items list/editor for a single checklist. Per docs/specs.md
+ * Spec 004, persists through `LocalChecklistsService` only (Feature Service
+ * -> `ChecklistRepository` -> SQLite).
+ *
+ * `LocalChecklistItem` (per Spec 002's "Addendum 2") models
+ * `title`/`notes`/`isCompleted`/`sortOrder` plus the originally-specified
+ * `quantity`/`isFragile`/`expires`/`expirationDate`/`imageUri` fields — this
+ * component edits all of them, mirroring the item-form fields used for
+ * `LocalItem` on the home screen.
+ */
 @Component({
   selector: 'app-checklist-items',
   templateUrl: './checklist-items.component.html',
   styleUrls: ['./checklist-items.component.scss'],
 })
 export class ChecklistItemsComponent {
-  @Input() checklist!: Checklist;
+  @Input() checklistId!: string;
+  @Input() items: LocalChecklistItem[] = [];
   @Output() checklistUpdated = new EventEmitter<void>();
 
-  editingItemIndex: number = -1;
-  tempItem: ChecklistItem = this.createEmptyItem();
+  editingItemIndex = -1;
+  tempTitle = '';
+  tempNotes = '';
+  tempQuantity = 1;
+  tempIsFragile = false;
+  tempExpires = false;
+  tempExpirationDate?: string;
+  tempImageUri?: string;
 
   constructor(
-    private checklistService: ChecklistService,
+    private localChecklistsService: LocalChecklistsService,
     private modalController: ModalController,
-    private toastService: ToastService
+    private platform: Platform
   ) {}
 
-  createEmptyItem(): ChecklistItem {
-    return {
-      id: 0,
-      name: '',
-      quantity: 1,
-      isCompleted: false,
-      isFragile: false,
-      expires: false,
-      expirationDate: null,
-      checklistId: this.checklist?.id || 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  private resetTemp() {
+    this.tempTitle = '';
+    this.tempNotes = '';
+    this.tempQuantity = 1;
+    this.tempIsFragile = false;
+    this.tempExpires = false;
+    this.tempExpirationDate = undefined;
+    this.tempImageUri = undefined;
   }
 
   addItem() {
@@ -48,73 +56,64 @@ export class ChecklistItemsComponent {
       return; // Already editing
     }
 
-    this.tempItem = this.createEmptyItem();
-    this.editingItemIndex = this.checklist.items.length; // Index for new item
-    // Don't push to array yet - only show the form
+    this.resetTemp();
+    this.editingItemIndex = this.items.length; // Index for new item
   }
 
   editItem(index: number) {
     if (this.editingItemIndex !== -1) {
-      this.cancelEdit(); // Cancel any existing edit
+      this.cancelEdit();
     }
 
+    const item = this.items[index];
     this.editingItemIndex = index;
-    this.tempItem = { ...this.checklist.items[index] };
+    this.tempTitle = item.title;
+    this.tempNotes = item.notes;
+    this.tempQuantity = item.quantity ?? 1;
+    this.tempIsFragile = item.isFragile ?? false;
+    this.tempExpires = item.expires ?? false;
+    this.tempExpirationDate = item.expirationDate;
+    this.tempImageUri = item.imageUri;
   }
 
   async saveItem() {
-    if (this.editingItemIndex === -1 || !this.tempItem.name.trim()) {
+    if (this.editingItemIndex === -1 || !this.tempTitle.trim()) {
       return;
     }
 
     try {
-      const isNewItem = this.editingItemIndex === this.checklist.items.length;
+      const isNewItem = this.editingItemIndex === this.items.length;
 
-      // Prepare data for sending, including the image if it exists
-      type ItemDataWithImage = {
-        name: string;
-        quantity: number;
-        isCompleted: boolean;
-        isFragile: boolean;
-        expires: boolean;
-        expirationDate: Date | null;
-        imageData?: string;
-      };
-
-      const itemData: ItemDataWithImage = {
-        name: this.tempItem.name.trim(),
-        quantity: this.tempItem.quantity || 1,
-        isCompleted: this.tempItem.isCompleted || false,
-        isFragile: this.tempItem.isFragile || false,
-        expires: this.tempItem.expires || false,
-        expirationDate: this.tempItem.expirationDate || null,
-        imageData: (this.tempItem as ChecklistItem & { imageData?: string })
-          .imageData,
+      const fields = {
+        title: this.tempTitle.trim(),
+        notes: this.tempNotes?.trim() ?? '',
+        quantity: this.tempQuantity || 1,
+        isFragile: this.tempIsFragile,
+        expires: this.tempExpires,
+        expirationDate: this.tempExpires ? this.tempExpirationDate : undefined,
+        imageUri: this.tempImageUri,
       };
 
       if (isNewItem) {
-        // Add new item
-        const newItem = await this.checklistService
-          .addItem(this.checklist.id, itemData)
-          .toPromise();
-
-        // Add the new item to the array
-        this.checklist.items.push(newItem!);
+        const newItem = await this.localChecklistsService.createChecklistItem({
+          checklistId: this.checklistId,
+          isCompleted: false,
+          ...fields,
+        });
+        this.items.push(newItem);
       } else {
-        // Update existing item
-        const updatedItem = await this.checklistService
-          .updateItem(this.checklist.items[this.editingItemIndex].id, itemData)
-          .toPromise();
-
-        // Update the item in local array with the returned item from server
-        this.checklist.items[this.editingItemIndex] = updatedItem!;
+        const updatedItem = await this.localChecklistsService.updateChecklistItem(
+          this.items[this.editingItemIndex].id,
+          fields
+        );
+        this.items[this.editingItemIndex] = updatedItem;
       }
 
       this.editingItemIndex = -1;
-      this.tempItem = this.createEmptyItem();
+      this.resetTemp();
       this.checklistUpdated.emit();
     } catch (error) {
-      console.error('Error saving item:', error);
+      console.error('Error saving checklist item:', error);
     }
   }
 
@@ -123,38 +122,42 @@ export class ChecklistItemsComponent {
       return;
     }
 
-    // Reset editing state
     this.editingItemIndex = -1;
-    this.tempItem = this.createEmptyItem();
+    this.resetTemp();
   }
 
-  onItemFormSave(formData: ItemFormData) {
-    // Update tempItem with form data
-    this.tempItem.name = formData.name;
-    this.tempItem.quantity = formData.quantity || 1;
-    this.tempItem.isFragile = formData.fragile;
-    this.tempItem.expires = formData.expires;
-    this.tempItem.expirationDate = formData.expirationDate
-      ? new Date(formData.expirationDate)
-      : null;
-
-    // Handle the image if present
-    const tempItemWithImage = this.tempItem as ChecklistItem & {
-      imageData?: string;
-    };
-    if (formData.hasImage && formData.imagePreview) {
-      // Extract only the Base64 data (remove the prefix data:image/jpeg;base64,)
-      const base64Data = formData.imagePreview.split(',')[1];
-      // In tempItem we don't store the image directly but a reference
-      // The backend will handle the image data
-      tempItemWithImage.imageData = base64Data;
-    } else {
-      // If the image was deactivated, clear the field
-      tempItemWithImage.imageData = null;
+  onExpiresChange() {
+    if (!this.tempExpires) {
+      this.tempExpirationDate = undefined;
     }
+  }
 
-    // Call existing saveItem method
-    this.saveItem();
+  async takePicture() {
+    try {
+      const source = this.platform.is('capacitor')
+        ? CameraSource.Prompt
+        : CameraSource.Photos;
+
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source,
+        width: 300,
+        height: 300,
+      });
+
+      const uri = image.webPath || image.path;
+      if (uri) {
+        this.tempImageUri = uri;
+      }
+    } catch (error) {
+      console.error('Error taking picture:', error);
+    }
+  }
+
+  removeImage() {
+    this.tempImageUri = undefined;
   }
 
   async removeItem(index: number) {
@@ -163,18 +166,12 @@ export class ChecklistItemsComponent {
     }
 
     try {
-      const item = this.checklist.items[index];
-
-      // Only call backend delete if the item has an ID (exists in database)
-      if (item.id) {
-        await this.checklistService.deleteItem(item.id).toPromise();
-      }
-
-      // Remove from local array
-      this.checklist.items.splice(index, 1);
+      const item = this.items[index];
+      await this.localChecklistsService.deleteChecklistItem(item.id);
+      this.items.splice(index, 1);
       this.checklistUpdated.emit();
     } catch (error) {
-      console.error('Error removing item:', error);
+      console.error('Error removing checklist item:', error);
     }
   }
 
@@ -184,43 +181,18 @@ export class ChecklistItemsComponent {
     }
 
     try {
-      const item = this.checklist.items[index];
+      const item = this.items[index];
       const newCompletionState = !item.isCompleted;
-      const isCompletingItem = newCompletionState; // Is the item being checked/completed
 
-      // Use the toggle endpoint for better performance
-      await this.checklistService.toggleItemCompletion(item.id).toPromise();
+      const updatedItem = await this.localChecklistsService.updateChecklistItem(
+        item.id,
+        { isCompleted: newCompletionState }
+      );
 
-      // Update local state
-      this.checklist.items[index].isCompleted = newCompletionState;
+      this.items[index] = updatedItem;
       this.checklistUpdated.emit();
-
-      // Show notification if the item was completed and the checklist is assigned to a box
-      if (isCompletingItem && this.checklist.boxId) {
-        await this.toastService.presentInfoToast(
-          `"${item.name}" has been added to ${
-            this.checklist.box?.name || 'the box'
-          }.`
-        );
-      }
     } catch (error) {
-      console.error('Error toggling item:', error);
-      // No need to revert since we didn't change local state yet
-    }
-  }
-
-  onExpiresChange() {
-    if (this.tempItem && !this.tempItem.expires) {
-      this.tempItem.expirationDate = null;
-    }
-  }
-
-  toggleExpires() {
-    this.tempItem.expires = !this.tempItem.expires;
-
-    if (!this.tempItem.expires) {
-      // If disabling expires, clear the date
-      this.tempItem.expirationDate = null;
+      console.error('Error toggling checklist item:', error);
     }
   }
 
@@ -229,20 +201,15 @@ export class ChecklistItemsComponent {
   }
 
   isNewItem(index: number): boolean {
-    return (
-      this.editingItemIndex === index && index === this.checklist.items.length
-    );
+    return this.editingItemIndex === index && index === this.items.length;
   }
 
-  // Utility methods for template
   getCompletedCount(): number {
-    return (
-      this.checklist?.items?.filter((item) => item.isCompleted).length || 0
-    );
+    return this.items.filter((item) => item.isCompleted).length;
   }
 
   getTotalCount(): number {
-    return this.checklist?.items?.length || 0;
+    return this.items.length;
   }
 
   getCompletionPercentage(): number {
@@ -251,66 +218,32 @@ export class ChecklistItemsComponent {
     return Math.round((this.getCompletedCount() / total) * 100);
   }
 
-  toggleItem(item: ChecklistItem) {
-    const index = this.checklist.items.indexOf(item);
+  toggleItem(item: LocalChecklistItem) {
+    const index = this.items.indexOf(item);
     if (index !== -1) {
       this.toggleItemCompletion(index);
     }
   }
 
-  deleteItem(item: ChecklistItem) {
-    const index = this.checklist.items.indexOf(item);
+  deleteItem(item: LocalChecklistItem) {
+    const index = this.items.indexOf(item);
     if (index !== -1) {
       this.removeItem(index);
     }
   }
 
-  formatDate(date: Date | null): string {
+  formatDate(date?: string): string {
     if (!date) return '';
     return new Date(date).toLocaleDateString();
   }
 
-  // Method to get the full image URL
-  getFullImageUrl(imageUrl: string): string {
-    if (!imageUrl) return '';
+  async showItemImage(item: LocalChecklistItem) {
+    if (!item.imageUri) return;
 
-    // Verify if it already has the domain prefix
-    if (imageUrl.startsWith('http')) {
-      return imageUrl;
-    }
-
-    // The backend now returns only the filename, not a path
-    // If the input has a path, extract only the filename
-    const filename = imageUrl.includes('/')
-      ? imageUrl.split('/').pop()
-      : imageUrl;
-
-    console.log('Original URL:', imageUrl);
-    console.log('Filename to use:', filename);
-
-    // Always use the path with /public/images/
-    const fullUrl = `${environment.apiUrl}/public/images/${filename}`;
-
-    console.log('Built URL to access the image:', fullUrl);
-
-    return fullUrl;
-  }
-
-  async showItemImage(item: ChecklistItem) {
-    if (!item.imageUrl) return;
-
-    console.log('Original image URL:', item.imageUrl);
-
-    // Use the common method to get the full URL
-    const fullImageUrl = this.getFullImageUrl(item.imageUrl);
-
-    console.log('Showing image with full URL:', fullImageUrl);
-
-    // Show the modal using the ImageModalComponent
     const modal = await this.modalController.create({
       component: ImageModalComponent,
       componentProps: {
-        imageUrl: fullImageUrl,
+        imageUrl: item.imageUri,
       },
       cssClass: 'image-modal',
     });

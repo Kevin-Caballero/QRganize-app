@@ -6,38 +6,38 @@
   // Estilos para inputs
   .name-item,
   .quantity-item {
-    --background: #222428;
-    --border-color: #3a4556;
+    --background: var(--app-color-surface);
+    --border-color: var(--app-card-border-color);
     --border-style: solid;
     --border-width: 1px;
-    --border-radius: 8px;
+    --border-radius: var(--app-radius-sm);
     --padding-start: 12px;
     --padding-end: 12px;
     --min-height: 44px;
     margin-bottom: 4px;
 
     ion-input {
-      --color: #ffffff;
-      --placeholder-color: #8c9eff;
-      color: #ffffff;
+      --color: var(--app-color-ink);
+      --placeholder-color: var(--app-color-accent-secondary);
+      color: var(--app-color-ink);
       font-size: 14px;
     }
 
     ion-label {
-      color: #8c9eff;
+      color: var(--app-color-accent-secondary);
       font-size: 14px;
       margin-right: 10px;
     }
 
     ion-icon {
-      color: #8c9eff;
+      color: var(--app-color-accent-secondary);
       margin-right: 8px;
     }
   }
 
   // Estilos para el selector de fechas
   ion-modal.date-picker-modal {
-    --border-radius: 16px;
+    --border-radius: var(--app-radius-lg);
     --height: auto;
     --width: 90%;
     --max-width: 350px;
@@ -121,9 +121,9 @@
       align-items: center;
       justify-content: center;
       padding: 6px 10px;
-      background: #2a3142;
-      color: #8c9eff;
-      border: 1px solid #3a4556;
+      background: var(--app-color-surface);
+      color: var(--app-color-accent-secondary);
+      border: 1px solid var(--app-card-border-color);
       border-radius: 16px;
       cursor: pointer;
       flex: 1;
@@ -184,12 +184,12 @@
     z-index: 100; // Asegurar que siempre estén visibles
 
     ion-button {
-      --border-radius: 4px;
+      --border-radius: var(--app-radius-sm);
       font-weight: 500;
       height: 36px;
 
       &[color="medium"] {
-        --color: #8c9eff;
+        --color: var(--app-color-accent-secondary);
       }
     }
   }

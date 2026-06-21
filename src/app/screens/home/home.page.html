@@ -1,15 +1,20 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Boxes</ion-title>
+    <ion-title class="app-text-h1">Boxes</ion-title>
 
     <ion-buttons slot="end">
-      <ion-button (click)="onAdd()">
+      <ion-button
+        (click)="onAdd()"
+        fill="clear"
+        color="primary"
+        aria-label="Add box"
+      >
         <ion-icon name="add-circle-outline" size="large"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" style="background: rgb(30, 30, 30)">
+<ion-content [fullscreen]="true" class="app-page">
   <app-box-list></app-box-list>
 </ion-content>

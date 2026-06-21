@@ -1,5 +1,5 @@
 export interface Item {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   imageUrl?: string;
@@ -13,7 +13,7 @@ export interface Item {
 export interface CreateItemDto {
   name: string;
   description?: string;
-  image?: string; // Base64 image data
+  image?: string; // local file URI, not Base64
   quantity?: number;
   isFragile?: boolean;
   expires?: boolean;

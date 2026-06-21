@@ -83,6 +83,21 @@ export class BoxStateService {
     });
   }
 
+  /**
+   * Adds an already-created box to the in-memory list/state (Spec 009 Step
+   * 4). Used by the consolidated create + add-items flow, where
+   * box-modal.component.ts creates the box itself (via BoxService) so the
+   * modal can stay open for the items sub-step, instead of going through
+   * `createBox()` above (which dismisses the modal immediately on success).
+   */
+  addBoxToState(box: Box) {
+    const current = this.boxesSubject.value;
+    this.boxesSubject.next({
+      data: [box, ...current.data],
+      count: current.count + 1,
+    });
+  }
+
   deleteBox(box: Box) {
     this.boxService.deleteBox(box).subscribe({
       next: () => {
@@ -102,7 +117,7 @@ export class BoxStateService {
     });
   }
 
-  updateBox(boxId: number, data: BoxReqDto) {
+  updateBox(boxId: string, data: BoxReqDto) {
     return this.boxService.updateBox(boxId, data).subscribe({
       next: (updatedBox) => {
         const current = this.boxesSubject.value;
@@ -129,7 +144,7 @@ export class BoxStateService {
 
   getBoxById(id: string): Observable<Box | undefined> {
     return this.boxes$.pipe(
-      map((data) => data.data.find((box) => box.id === +id))
+      map((data) => data.data.find((box) => box.id === id))
     );
   }
 }

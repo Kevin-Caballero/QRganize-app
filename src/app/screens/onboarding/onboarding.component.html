@@ -1,4 +1,4 @@
-<ion-content fullscreen="true">
+<ion-content fullscreen="true" class="app-page">
   <swiper-container
     #swiper
     [pagination]="true"
@@ -11,10 +11,10 @@
           alt="Illustration"
           class="slide-image"
         />
-        <h2>
-          <ion-label color="primary"><b>Easy</b></ion-label> to Use
+        <h2 class="app-text-display">
+          <span class="accent">Easy</span> to Use
         </h2>
-        <p>
+        <p class="app-text-body">
           Our app simplifies the moving process, helping you organize and manage
           all your boxes and belongings efficiently.
         </p>
@@ -26,11 +26,11 @@
         alt="Inventory Illustration"
         class="slide-image"
       />
-      <h2>
+      <h2 class="app-text-display">
         Create
-        <ion-label color="primary"><b>Detailed</b></ion-label> Inventories
+        <span class="accent">Detailed</span> Inventories
       </h2>
-      <p>
+      <p class="app-text-body">
         Record all items in your boxes, assign labels, and categorize each
         object to make searching and tracking during the move easier.
       </p>
@@ -41,8 +41,8 @@
         alt="QR Code Illustration"
         class="slide-image"
       />
-      <h2>Label with <ion-label color="primary">QR</ion-label></h2>
-      <p>
+      <h2 class="app-text-display">Label with <span class="accent">QR</span></h2>
+      <p class="app-text-body">
         Use QR codes to label each box. Scan the codes to get an instant list of
         contents.
       </p>
@@ -53,33 +53,36 @@
         alt="Tracking Illustration"
         class="slide-image"
       />
-      <h2>
-        Start Your <ion-label color="primary"><b>Move</b></ion-label>
+      <h2 class="app-text-display">
+        Start Your <span class="accent">Move</span>
       </h2>
-      <p>
+      <p class="app-text-body">
         You are ready to start! Use our app to organize your boxes, label with
         QR codes, and make your move much easier and more efficient.
       </p>
-      <ion-button fill="solid" color="primary" (click)="startApp()"
+      <ion-button fill="solid" class="app-primary-action" (click)="startApp()"
         >Get Started</ion-button
+      >
+      <ion-button fill="clear" class="secondary-action" (click)="goToLogin()"
+        >Already have an account? Log in</ion-button
       >
     </swiper-slide>
   </swiper-container>
 </ion-content>
 <ion-footer>
   <ion-toolbar>
-    <ion-button fill="clear" color="secondary" (click)="skip()"
+    <ion-button fill="clear" class="skip-action" (click)="skip()"
       >Skip</ion-button
     >
     <ion-progress-bar
       type="determinate"
       [value]="progress"
-      color="primary"
+      class="onboarding-progress"
     ></ion-progress-bar>
     <ion-button
       slot="end"
       fill="clear"
-      color="primary"
+      class="next-action"
       (click)="next()"
       [disabled]="!canNext"
       >Next</ion-button

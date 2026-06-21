@@ -76,164 +76,6 @@
   --ion-color-light-tint: #f5f6f9;
 }
 
-@media (prefers-color-scheme: dark) {
-  /*
-   * Dark Colors
-   * -------------------------------------------
-   */
-
-  body {
-    --ion-color-primary: #428cff;
-    --ion-color-primary-rgb: 66, 140, 255;
-    --ion-color-primary-contrast: #ffffff;
-    --ion-color-primary-contrast-rgb: 255, 255, 255;
-    --ion-color-primary-shade: #3a7be0;
-    --ion-color-primary-tint: #5598ff;
-
-    --ion-color-secondary: #50c8ff;
-    --ion-color-secondary-rgb: 80, 200, 255;
-    --ion-color-secondary-contrast: #ffffff;
-    --ion-color-secondary-contrast-rgb: 255, 255, 255;
-    --ion-color-secondary-shade: #46b0e0;
-    --ion-color-secondary-tint: #62ceff;
-
-    --ion-color-tertiary: #6a64ff;
-    --ion-color-tertiary-rgb: 106, 100, 255;
-    --ion-color-tertiary-contrast: #ffffff;
-    --ion-color-tertiary-contrast-rgb: 255, 255, 255;
-    --ion-color-tertiary-shade: #5d58e0;
-    --ion-color-tertiary-tint: #7974ff;
-
-    --ion-color-success: #2fdf75;
-    --ion-color-success-rgb: 47, 223, 117;
-    --ion-color-success-contrast: #000000;
-    --ion-color-success-contrast-rgb: 0, 0, 0;
-    --ion-color-success-shade: #29c467;
-    --ion-color-success-tint: #44e283;
-
-    --ion-color-warning: #ffd534;
-    --ion-color-warning-rgb: 255, 213, 52;
-    --ion-color-warning-contrast: #000000;
-    --ion-color-warning-contrast-rgb: 0, 0, 0;
-    --ion-color-warning-shade: #e0bb2e;
-    --ion-color-warning-tint: #ffd948;
-
-    --ion-color-danger: #ff4961;
-    --ion-color-danger-rgb: 255, 73, 97;
-    --ion-color-danger-contrast: #ffffff;
-    --ion-color-danger-contrast-rgb: 255, 255, 255;
-    --ion-color-danger-shade: #e04055;
-    --ion-color-danger-tint: #ff5b71;
-
-    --ion-color-dark: #f4f5f8;
-    --ion-color-dark-rgb: 244, 245, 248;
-    --ion-color-dark-contrast: #000000;
-    --ion-color-dark-contrast-rgb: 0, 0, 0;
-    --ion-color-dark-shade: #d7d8da;
-    --ion-color-dark-tint: #f5f6f9;
-
-    --ion-color-medium: #989aa2;
-    --ion-color-medium-rgb: 152, 154, 162;
-    --ion-color-medium-contrast: #000000;
-    --ion-color-medium-contrast-rgb: 0, 0, 0;
-    --ion-color-medium-shade: #86888f;
-    --ion-color-medium-tint: #a2a4ab;
-
-    --ion-color-light: #222428;
-    --ion-color-light-rgb: 34, 36, 40;
-    --ion-color-light-contrast: #ffffff;
-    --ion-color-light-contrast-rgb: 255, 255, 255;
-    --ion-color-light-shade: #1e2023;
-    --ion-color-light-tint: #383a3e;
-  }
-
-  /*
-   * iOS Dark Theme
-   * -------------------------------------------
-   */
-
-  .ios body {
-    --ion-background-color: #000000;
-    --ion-background-color-rgb: 0, 0, 0;
-
-    --ion-text-color: #ffffff;
-    --ion-text-color-rgb: 255, 255, 255;
-
-    --ion-color-step-50: #0d0d0d;
-    --ion-color-step-100: #1a1a1a;
-    --ion-color-step-150: #262626;
-    --ion-color-step-200: #333333;
-    --ion-color-step-250: #404040;
-    --ion-color-step-300: #4d4d4d;
-    --ion-color-step-350: #595959;
-    --ion-color-step-400: #666666;
-    --ion-color-step-450: #737373;
-    --ion-color-step-500: #808080;
-    --ion-color-step-550: #8c8c8c;
-    --ion-color-step-600: #999999;
-    --ion-color-step-650: #a6a6a6;
-    --ion-color-step-700: #b3b3b3;
-    --ion-color-step-750: #bfbfbf;
-    --ion-color-step-800: #cccccc;
-    --ion-color-step-850: #d9d9d9;
-    --ion-color-step-900: #e6e6e6;
-    --ion-color-step-950: #f2f2f2;
-
-    --ion-item-background: #000000;
-
-    --ion-card-background: #1c1c1d;
-  }
-
-  .ios ion-modal {
-    --ion-background-color: var(--ion-color-step-100);
-    --ion-toolbar-background: var(--ion-color-step-150);
-    --ion-toolbar-border-color: var(--ion-color-step-250);
-  }
-
-  /*
-   * Material Design Dark Theme
-   * -------------------------------------------
-   */
-
-  .md body {
-    --ion-background-color: #121212;
-    --ion-background-color-rgb: 18, 18, 18;
-
-    --ion-text-color: #ffffff;
-    --ion-text-color-rgb: 255, 255, 255;
-
-    --ion-border-color: #222222;
-
-    --ion-color-step-50: #1e1e1e;
-    --ion-color-step-100: #2a2a2a;
-    --ion-color-step-150: #363636;
-    --ion-color-step-200: #414141;
-    --ion-color-step-250: #4d4d4d;
-    --ion-color-step-300: #595959;
-    --ion-color-step-350: #656565;
-    --ion-color-step-400: #717171;
-    --ion-color-step-450: #7d7d7d;
-    --ion-color-step-500: #898989;
-    --ion-color-step-550: #949494;
-    --ion-color-step-600: #a0a0a0;
-    --ion-color-step-650: #acacac;
-    --ion-color-step-700: #b8b8b8;
-    --ion-color-step-750: #c4c4c4;
-    --ion-color-step-800: #d0d0d0;
-    --ion-color-step-850: #dbdbdb;
-    --ion-color-step-900: #e7e7e7;
-    --ion-color-step-950: #f3f3f3;
-
-    --ion-item-background: #1e1e1e;
-
-    --ion-toolbar-background: #2a3358;
-
-    --ion-tab-bar-background: #1f1f1f;
-
-    --ion-card-background: #1e1e1e;
-  }
-}
-
 html {
   /* 
    * For more information on dynamic font scaling, visit the documentation:
@@ -251,4 +93,340 @@ html {
 
   --ion-color-facebook: #1877f2;
   --ion-color-facebook-rgb: 24, 119, 242;
+}
+
+/*
+ * App design tokens
+ * -------------------------------------------
+ * Built on top of the Ionic CSS variables above so we keep a single source
+ * of truth for color, instead of introducing a parallel palette.
+ */
+:root {
+  /** spacing scale **/
+  --app-space-xs: 4px;
+  --app-space-sm: 8px;
+  --app-space-md: 16px;
+  --app-space-lg: 24px;
+  --app-space-xl: 32px;
+
+  /** radius scale
+      Audited against Spec 008's "generous/box-corner" target
+      (12-16px cards, 8px inputs). Spec 001's defaults already match this
+      shape (sm=8 for inputs, md=12/lg=16 for cards), so no numeric change
+      is needed here -- kept as-is intentionally. **/
+  --app-radius-sm: 8px;
+  --app-radius-md: 12px;
+  --app-radius-lg: 16px;
+
+  /** surface / card colors (light theme) **/
+  --app-surface-color: var(--app-color-bg);
+  --app-surface-contrast: var(--app-color-ink);
+  --app-card-background: var(--app-color-surface);
+  --app-card-border-color: #e8dfcd;
+  --app-card-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+
+  /** popover / overlay surface (used by dark, fixed-color overlays such as
+      the select popover, regardless of theme) **/
+  --app-overlay-background: var(--ion-color-dark, #222428);
+  --app-overlay-background-tint: var(--ion-color-dark-tint, #383a3e);
+  --app-overlay-border-color: var(--ion-color-dark-tint, #383a3e);
+  --app-overlay-color: var(--ion-color-dark-contrast, #ffffff);
+  --app-overlay-accent: var(--ion-color-primary-tint, #4c8dff);
+
+  /** state colors **/
+  --app-empty-state-color: var(--ion-color-medium, #92949c);
+  --app-error-color: var(--ion-color-danger, #eb445a);
+
+  /**
+   * Spec 008 "moving label" identity -- color tokens (light theme)
+   * Layered on top of the tokens above; nothing here is replaced/removed.
+   */
+  --app-color-bg: #faf6ef;
+  --app-color-surface: #fffdf8;
+  --app-color-accent-primary: #ff5a36;
+  --app-color-accent-secondary: #2d6e7e;
+  --app-color-ink: #2b231c;
+  --app-color-success: #3f8f5f;
+  --app-color-accent-primary-contrast: #ffffff;
+  --app-color-accent-secondary-contrast: #ffffff;
+
+  /**
+   * Spec 009 packing-lifecycle badge token (light theme).
+   * New token, documented per the spec's "called out again at
+   * implementation time for sign-off before use" requirement:
+   * `.app-badge--packing` uses this amber; `.app-badge--sealed` reuses the
+   * existing `--app-color-success` token instead of introducing a second
+   * new color.
+   */
+  --app-color-progress-amber: #e8a33d;
+
+  /** type scale (Spec 008) -- sizes only; font-family is applied via the
+      .app-text-* classes in global.scss so this file stays Ionic-variable
+      focused and font choices stay co-located with the @font-face/link
+      setup. **/
+  --app-text-display-size: 2rem; /* 32px */
+  --app-text-display-line-height: 1.15;
+  --app-text-h1-size: 1.5rem; /* 24px */
+  --app-text-h1-line-height: 1.25;
+  --app-text-h2-size: 1.125rem; /* 18px */
+  --app-text-h2-line-height: 1.3;
+  --app-text-body-size: 1rem; /* 16px */
+  --app-text-body-line-height: 1.5;
+  --app-text-caption-size: 0.8125rem; /* 13px */
+  --app-text-caption-line-height: 1.4;
+}
+
+/*
+ * Wire the "moving label" tokens into the actual Ionic semantic variables.
+ * Most of the app's markup uses stock Ionic components/attributes
+ * (color="primary", default ion-card/ion-toolbar/ion-tab-bar/ion-fab-button)
+ * which read --ion-color-primary/--ion-background-color/--ion-card-background
+ * etc. directly -- defining --app-color-* tokens alone (Spec 008's first
+ * pass) never reached these, so the app kept rendering in stock Ionic
+ * blue/gray. This block is what actually makes the identity visible.
+ */
+:root {
+  --ion-color-primary: var(--app-color-accent-primary);
+  --ion-color-primary-rgb: 255, 90, 54;
+  --ion-color-primary-contrast: var(--app-color-accent-primary-contrast);
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #e04f2f;
+  --ion-color-primary-tint: #ff7256;
+
+  --ion-color-secondary: var(--app-color-accent-secondary);
+  --ion-color-secondary-rgb: 45, 110, 126;
+  --ion-color-secondary-contrast: var(--app-color-accent-secondary-contrast);
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #28606d;
+  --ion-color-secondary-tint: #427c8a;
+
+  --ion-color-success: var(--app-color-success);
+  --ion-color-success-rgb: 63, 143, 95;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #387e54;
+  --ion-color-success-tint: #539a70;
+
+  --ion-background-color: var(--app-color-bg);
+  --ion-background-color-rgb: 250, 246, 239;
+  --ion-text-color: var(--app-color-ink);
+  --ion-text-color-rgb: 43, 35, 28;
+
+  --ion-toolbar-background: var(--app-color-surface);
+  --ion-toolbar-color: var(--app-color-ink);
+  --ion-item-background: var(--app-color-surface);
+  --ion-card-background: var(--app-color-surface);
+  --ion-tab-bar-background: var(--app-color-surface);
+}
+
+/*
+ * Single source of truth for dark mode (Spec 016).
+ *
+ * Previously this app had two parallel dark-mode mechanisms: this
+ * `body.dark` class block (driven by the in-app appearance toggle) and a
+ * `@media (prefers-color-scheme: dark)` block (driven automatically by the
+ * OS, not user-controllable). Spec 016 consolidates dark mode onto this
+ * single class-based block -- `body.dark` present = dark theme, absent =
+ * light theme. "System" theme selection is now implemented in TypeScript
+ * (`AppearanceService`), which reads `matchMedia('(prefers-color-scheme:
+ * dark)')` once and adds/removes this same `dark` class accordingly, plus
+ * listens for live OS changes while "System" remains selected. No CSS here
+ * keys off `prefers-color-scheme` directly anymore.
+ *
+ * Merge note: the deleted `@media (prefers-color-scheme: dark)` block (that
+ * used to sit at the top of this file, right after the light `:root`
+ * palette) set the stock Ionic `--ion-color-tertiary/-warning/-danger/-dark/
+ * -medium/-light` dark values, plus iOS/MD-specific `.ios body` / `.md body`
+ * dark theme variables (color-step scale, item/card/toolbar/tab-bar
+ * backgrounds) and an `.ios ion-modal` override. Those were NOT previously
+ * duplicated anywhere in this `body.dark` block. They are merged in below
+ * (see "Merged from the deleted OS-driven media query" sections) rather
+ * than being silently dropped, per Spec 016's explicit requirement not to
+ * regress iOS/MD-specific dark styling.
+ *
+ * A second `@media (prefers-color-scheme: dark)` block further down in this
+ * file (which only re-stated `--app-*` token values already present here,
+ * give or take `--app-card-background`'s source variable) has also been
+ * removed as redundant with this block.
+ */
+body.dark {
+  --app-color-bg: #1a1714;
+  --app-color-surface: #241f1a;
+  --app-color-accent-primary: #ff7a57;
+  --app-color-accent-secondary: #5fb8cc;
+  --app-color-ink: #f2ece3;
+  --app-color-success: #5fbe82;
+  --app-color-accent-primary-contrast: #1a1714;
+  --app-color-accent-secondary-contrast: #1a1714;
+  /* Spec 009 packing-lifecycle badge token -- dark-mode equivalent.
+     Lightened amber (light mode #E8A33D) for legibility against the dark
+     warm surface, same treatment as the other Spec 008 dark-mode accents
+     above. */
+  --app-color-progress-amber: #f0b860;
+
+  --app-surface-color: var(--ion-color-step-50, #1e1e1e);
+  --app-surface-contrast: var(--ion-color-light, #f4f5f8);
+  --app-card-background: var(--app-color-surface);
+  --app-card-border-color: #3a332b;
+  --app-card-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+  --ion-color-primary: var(--app-color-accent-primary);
+  --ion-color-primary-contrast: var(--app-color-accent-primary-contrast);
+  --ion-color-primary-shade: #e0683f;
+  --ion-color-primary-tint: #ff8c6e;
+
+  --ion-color-secondary: var(--app-color-accent-secondary);
+  --ion-color-secondary-contrast: var(--app-color-accent-secondary-contrast);
+  --ion-color-secondary-shade: #54a2b3;
+  --ion-color-secondary-tint: #72c2d3;
+
+  --ion-color-success: var(--app-color-success);
+  --ion-color-success-shade: #54a774;
+  --ion-color-success-tint: #70c690;
+
+  --ion-background-color: var(--app-color-bg);
+  --ion-text-color: var(--app-color-ink);
+  --ion-toolbar-background: var(--app-color-surface);
+  --ion-toolbar-color: var(--app-color-ink);
+  --ion-item-background: var(--app-color-surface);
+  --ion-card-background: var(--app-color-surface);
+  --ion-tab-bar-background: var(--app-color-surface);
+
+  /*
+   * Merged from the deleted OS-driven media query: stock Ionic dark-mode
+   * values for the palettes the "moving label" identity does not override
+   * (tertiary/warning/danger/dark/medium/light). Unchanged from the
+   * original media-query values -- carried over verbatim.
+   */
+  --ion-color-tertiary: #6a64ff;
+  --ion-color-tertiary-rgb: 106, 100, 255;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #5d58e0;
+  --ion-color-tertiary-tint: #7974ff;
+
+  --ion-color-warning: #ffd534;
+  --ion-color-warning-rgb: 255, 213, 52;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #e0bb2e;
+  --ion-color-warning-tint: #ffd948;
+
+  --ion-color-danger: #ff4961;
+  --ion-color-danger-rgb: 255, 73, 97;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #e04055;
+  --ion-color-danger-tint: #ff5b71;
+
+  --ion-color-dark: #f4f5f8;
+  --ion-color-dark-rgb: 244, 245, 248;
+  --ion-color-dark-contrast: #000000;
+  --ion-color-dark-contrast-rgb: 0, 0, 0;
+  --ion-color-dark-shade: #d7d8da;
+  --ion-color-dark-tint: #f5f6f9;
+
+  --ion-color-medium: #989aa2;
+  --ion-color-medium-rgb: 152, 154, 162;
+  --ion-color-medium-contrast: #000000;
+  --ion-color-medium-contrast-rgb: 0, 0, 0;
+  --ion-color-medium-shade: #86888f;
+  --ion-color-medium-tint: #a2a4ab;
+
+  --ion-color-light: #222428;
+  --ion-color-light-rgb: 34, 36, 40;
+  --ion-color-light-contrast: #ffffff;
+  --ion-color-light-contrast-rgb: 255, 255, 255;
+  --ion-color-light-shade: #1e2023;
+  --ion-color-light-tint: #383a3e;
+}
+
+/*
+ * Merged from the deleted OS-driven media query: iOS-specific dark theme
+ * variables (color-step scale, item/card/toolbar backgrounds). These
+ * existed ONLY inside the old `@media (prefers-color-scheme: dark)` block
+ * and were not previously duplicated in `body.dark` -- confirmed gap from
+ * Spec 016's investigation, merged here rather than dropped.
+ */
+.ios body.dark {
+  --ion-background-color: var(--app-color-bg);
+  --ion-background-color-rgb: 26, 23, 20;
+
+  --ion-text-color: var(--app-color-ink);
+  --ion-text-color-rgb: 242, 236, 227;
+
+  --ion-color-step-50: #0d0d0d;
+  --ion-color-step-100: #1a1a1a;
+  --ion-color-step-150: #262626;
+  --ion-color-step-200: #333333;
+  --ion-color-step-250: #404040;
+  --ion-color-step-300: #4d4d4d;
+  --ion-color-step-350: #595959;
+  --ion-color-step-400: #666666;
+  --ion-color-step-450: #737373;
+  --ion-color-step-500: #808080;
+  --ion-color-step-550: #8c8c8c;
+  --ion-color-step-600: #999999;
+  --ion-color-step-650: #a6a6a6;
+  --ion-color-step-700: #b3b3b3;
+  --ion-color-step-750: #bfbfbf;
+  --ion-color-step-800: #cccccc;
+  --ion-color-step-850: #d9d9d9;
+  --ion-color-step-900: #e6e6e6;
+  --ion-color-step-950: #f2f2f2;
+
+  --ion-item-background: var(--app-color-surface);
+
+  --ion-card-background: var(--app-color-surface);
+  --ion-toolbar-background: var(--app-color-surface);
+}
+
+.ios body.dark ion-modal,
+body.dark .ios ion-modal {
+  --ion-background-color: var(--app-color-surface);
+  --ion-toolbar-background: var(--app-color-surface);
+  --ion-toolbar-border-color: var(--ion-color-step-250);
+}
+
+/*
+ * Merged from the deleted OS-driven media query: Material Design-specific
+ * dark theme variables. Same gap as the iOS block above -- only existed in
+ * the media query previously, merged here now.
+ */
+.md body.dark {
+  --ion-background-color: var(--app-color-bg);
+  --ion-background-color-rgb: 26, 23, 20;
+
+  --ion-text-color: var(--app-color-ink);
+  --ion-text-color-rgb: 242, 236, 227;
+
+  --ion-border-color: #222222;
+
+  --ion-color-step-50: #1e1e1e;
+  --ion-color-step-100: #2a2a2a;
+  --ion-color-step-150: #363636;
+  --ion-color-step-200: #414141;
+  --ion-color-step-250: #4d4d4d;
+  --ion-color-step-300: #595959;
+  --ion-color-step-350: #656565;
+  --ion-color-step-400: #717171;
+  --ion-color-step-450: #7d7d7d;
+  --ion-color-step-500: #898989;
+  --ion-color-step-550: #949494;
+  --ion-color-step-600: #a0a0a0;
+  --ion-color-step-650: #acacac;
+  --ion-color-step-700: #b8b8b8;
+  --ion-color-step-750: #c4c4c4;
+  --ion-color-step-800: #d0d0d0;
+  --ion-color-step-850: #dbdbdb;
+  --ion-color-step-900: #e7e7e7;
+  --ion-color-step-950: #f3f3f3;
+
+  --ion-item-background: var(--app-color-surface);
+
+  --ion-toolbar-background: var(--app-color-surface);
+
+  --ion-tab-bar-background: var(--app-color-surface);
+
+  --ion-card-background: var(--app-color-surface);
 }

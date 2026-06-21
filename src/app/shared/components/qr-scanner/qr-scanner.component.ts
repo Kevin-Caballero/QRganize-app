@@ -106,7 +106,17 @@ export class QrScannerComponent implements OnInit, OnDestroy {
 
   private extractBoxIdFromQrData(data: string): string | null {
     try {
-      // Handle different QR data formats
+      // New local-first payload format: `qrganize:box:<uuid>` (see
+      // docs/specs.md Spec 002/003 — opaque string box IDs end to end).
+      const newFormatPrefix = 'qrganize:box:';
+      if (data.startsWith(newFormatPrefix)) {
+        const id = data.substring(newFormatPrefix.length).trim();
+        return id || null;
+      }
+
+      // Legacy fallback: previously-printed QR codes encoded a literal
+      // backend URL (`http://localhost:3000/box/{id}`). Kept so old codes
+      // still scan even though boxes are no longer backend-numeric IDs.
       if (data.includes('/box/')) {
         const parts = data.split('/box/');
         if (parts.length > 1) {
@@ -115,7 +125,7 @@ export class QrScannerComponent implements OnInit, OnDestroy {
         }
       }
 
-      // If it's just a number, assume it's a box ID
+      // Legacy fallback: a bare numeric string was treated as a box ID.
       if (/^\d+$/.test(data)) {
         return data;
       }

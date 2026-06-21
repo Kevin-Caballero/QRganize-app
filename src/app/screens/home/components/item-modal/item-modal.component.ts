@@ -4,6 +4,7 @@ import { ModalController, LoadingController, Platform } from '@ionic/angular';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { ToastService } from 'src/app/shared/services/toast.service';
 import { Item } from 'src/app/screens/home/models/item.interface';
+import { ImageUrlService } from 'src/app/shared/services/image-url.service';
 
 @Component({
   selector: 'app-item-modal',
@@ -11,12 +12,19 @@ import { Item } from 'src/app/screens/home/models/item.interface';
   styleUrls: ['./item-modal.component.scss'],
 })
 export class ItemModalComponent implements OnInit {
-  @Input() boxId!: number;
+  @Input() boxId!: string;
   @Input() item?: Item; // For editing existing items
 
   itemForm: FormGroup;
   isEditing = false;
   imagePreview: string | null = null;
+  /**
+   * Local file URI persisted to `LocalItem.imageUri` (see docs/specs.md
+   * Spec 002 addendum — image upload must produce a local file URI, not a
+   * base64 blob). `imagePreview` above stays whatever is displayable in the
+   * `<img>` tag (a `webPath`/data URL); `imageUri` is what's actually saved.
+   */
+  imageUri: string | null = null;
   selectedFileName: string | null = null;
 
   constructor(
@@ -24,7 +32,8 @@ export class ItemModalComponent implements OnInit {
     private formBuilder: FormBuilder,
     private loadingController: LoadingController,
     private toastService: ToastService,
-    private platform: Platform
+    private platform: Platform,
+    private imageUrlService: ImageUrlService
   ) {
     this.itemForm = this.formBuilder.group({
       name: ['', [Validators.required, Validators.maxLength(100)]],
@@ -63,9 +72,19 @@ export class ItemModalComponent implements OnInit {
           : null,
       });
 
-      this.imagePreview = this.item.imageUrl || null;
-      if (this.imagePreview) {
+      this.imageUri = this.item.imageUrl || null;
+      if (this.imageUri) {
         this.selectedFileName = 'existing-image.jpg';
+        // Resolution is async (Spec 012) — native/web both go through
+        // resolveImageSrc(), which also short-circuits dead blob: rows to
+        // null so the placeholder shows instead of a broken <img>.
+        this.imageUrlService
+          .resolveImageSrc(this.imageUri)
+          .then((resolved) => {
+            this.imagePreview = resolved;
+          });
+      } else {
+        this.imagePreview = null;
       }
     }
   }
@@ -77,17 +96,22 @@ export class ItemModalComponent implements OnInit {
         ? CameraSource.Prompt
         : CameraSource.Photos;
 
+      // `Uri` (rather than `DataUrl`) gives back a local file URI/webPath,
+      // matching the "store a local file URI, not base64" decision (see
+      // docs/specs.md Spec 002 addendum).
       const image = await Camera.getPhoto({
         quality: 90,
         allowEditing: false,
-        resultType: CameraResultType.DataUrl,
+        resultType: CameraResultType.Uri,
         source: source,
         width: 300,
         height: 300,
       });
 
-      if (image.dataUrl) {
-        this.imagePreview = image.dataUrl;
+      const uri = image.webPath || image.path;
+      if (uri) {
+        this.imagePreview = uri;
+        this.imageUri = uri;
         this.selectedFileName = `photo-${new Date().getTime()}.jpg`;
       }
     } catch (error) {
@@ -108,16 +132,23 @@ export class ItemModalComponent implements OnInit {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.onchange = (event: Event) => {
+    input.onchange = async (event: Event) => {
       const target = event.target as HTMLInputElement;
       const file = target.files?.[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          this.imagePreview = e.target?.result as string;
-          this.selectedFileName = file.name;
-        };
-        reader.readAsDataURL(file);
+        // Copy the picked file into durable on-device storage (Spec 012)
+        // and store the resulting marker URI, never a
+        // `URL.createObjectURL(file)` blob: URL — those only live for the
+        // current document lifetime and leave a dead reference in SQLite
+        // after any reload.
+        const persistedUri = await this.imageUrlService.persistPickedFile(
+          file
+        );
+        this.imageUri = persistedUri;
+        this.imagePreview = await this.imageUrlService.resolveImageSrc(
+          persistedUri
+        );
+        this.selectedFileName = file.name;
       }
     };
     input.click();
@@ -125,6 +156,7 @@ export class ItemModalComponent implements OnInit {
 
   removeImage() {
     this.imagePreview = null;
+    this.imageUri = null;
     this.selectedFileName = null;
   }
 
@@ -137,11 +169,11 @@ export class ItemModalComponent implements OnInit {
 
       try {
         const formValue = this.itemForm.value;
-        // Adapting the object to match the interface expected by the backend
+        // `image` is a local file URI (see `imageUri` above), not base64.
         const itemData = {
           name: formValue.name,
           description: formValue.description || undefined,
-          image: this.imagePreview || undefined,
+          image: this.imageUri || undefined,
           quantity: formValue.quantity,
           isFragile: formValue.isFragile,
           expires: formValue.expires,

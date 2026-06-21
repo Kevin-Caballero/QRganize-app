@@ -1,16 +1,3 @@
-.container::before {
-  content: "";
-  background-image: url("../../../assets/header1.svg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-}
-
 .container {
   display: flex;
   margin: 0 auto;
@@ -20,6 +7,7 @@
   padding: 16px;
   text-align: center;
   max-width: 600px;
+  background: var(--app-color-bg);
 
   .top {
     max-width: 600px;
@@ -28,8 +16,6 @@
     width: 100%;
 
     .title {
-      font-size: 30px;
-      font-weight: bold;
       margin-bottom: 0;
       margin-left: -16px;
     }
@@ -54,10 +40,7 @@
 .highlight {
   font-weight: bolder;
   font-size: 1.2em;
-}
-.title {
-  font-size: 30px;
-  font-weight: bold;
+  color: var(--app-color-accent-primary);
 }
 
 .actions {
@@ -67,6 +50,12 @@
 
   ion-button {
     width: 45%;
+    min-height: 44px;
+  }
+
+  .secondary-action {
+    --color: var(--app-color-accent-secondary);
+    --border-color: var(--app-color-accent-secondary);
   }
 }
 

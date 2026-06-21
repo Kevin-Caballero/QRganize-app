@@ -1,0 +1,12 @@
+.app-startup-splash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+
+  &--error {
+    padding: 16px;
+    text-align: center;
+  }
+}

@@ -1,13 +1,13 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Search</ion-title>
+    <ion-title class="app-text-h1">Search</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Search</ion-title>
+      <ion-title size="large" class="app-text-h1">Search</ion-title>
     </ion-toolbar>
   </ion-header>
 
@@ -16,7 +16,7 @@
     <ion-searchbar
       [(ngModel)]="searchTerm"
       (ionInput)="onSearchInput($event)"
-      placeholder="Search boxes and items by name or description"
+      placeholder="Search boxes, items, and checklists"
       debounce="300"
       show-clear-button="focus"
     >
@@ -36,114 +36,157 @@
   <!-- Search Results -->
   <div class="search-content" *ngIf="hasSearched">
     <!-- Loading State -->
-    <div class="loading-container" *ngIf="isSearching">
+    <div class="app-loading-state" *ngIf="isSearching">
       <ion-spinner name="crescent"></ion-spinner>
-      <ion-text color="medium">Searching...</ion-text>
+      <p class="app-text-body">Searching...</p>
     </div>
 
     <!-- Results -->
     <div class="results-container" *ngIf="!isSearching">
-      <ion-text color="medium" class="results-header">
-        <p>{{ searchResults.length }} result(s) found for "{{ searchTerm }}"</p>
-      </ion-text>
+      <p class="app-text-caption results-header">
+        {{ totalResultsCount }} result(s) found for "{{ searchTerm }}"
+      </p>
 
       <!-- No Results -->
-      <div class="no-results" *ngIf="searchResults.length === 0">
-        <ion-icon name="search-outline" color="medium" size="large"></ion-icon>
-        <ion-text color="medium">
-          <h3>No boxes found</h3>
-          <p>Try adjusting your search terms or create a new box.</p>
-        </ion-text>
+      <div class="empty-state" *ngIf="totalResultsCount === 0">
+        <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+        <h2>No results found</h2>
+        <p>
+          Nothing matches "{{ searchTerm }}" &mdash; try a different search
+          term, or create a new box or checklist.
+        </p>
       </div>
 
-      <!-- Results List -->
-      <ion-list *ngIf="searchResults.length > 0">
-        <ion-item
-          *ngFor="let box of searchResults"
+      <!-- Box Results List -->
+      <div class="results-list" *ngIf="boxResults.length > 0">
+        <ion-card
+          class="app-card app-card--labeled result-card"
+          *ngFor="let box of boxResults"
           [routerLink]="['/tabs/home/box', box.id]"
           button
         >
-          <ion-thumbnail slot="start" *ngIf="box.imageUrl">
-            <img [src]="box.imageUrl" [alt]="box.name" />
-          </ion-thumbnail>
-          <ion-icon
-            name="cube-outline"
-            slot="start"
-            color="primary"
-            size="large"
-            *ngIf="!box.imageUrl"
-          >
-          </ion-icon>
-
-          <ion-label>
-            <h3>{{ box.name }}</h3>
-            <p *ngIf="box.description">{{ box.description }}</p>
-
-            <!-- Show general items info when no specific matches -->
-            <div
-              *ngIf="box.items && box.items.length > 0 && !hasMatchingItems(box)"
-              class="items-info"
+          <div class="result-row">
+            <ion-thumbnail slot="start" *ngIf="getResolvedBoxImageUrl(box)">
+              <img [src]="getResolvedBoxImageUrl(box)" [alt]="box.name" />
+            </ion-thumbnail>
+            <ion-icon
+              name="cube-outline"
+              slot="start"
+              color="primary"
+              size="large"
+              *ngIf="!getResolvedBoxImageUrl(box)"
             >
-              <ion-note color="primary">
-                {{ box.items.length }} item(s):
-                <span *ngFor="let item of box.items.slice(0, 3); let i = index">
-                  {{ item.name }}<span
-                    *ngIf="i < box.items.slice(0, 3).length - 1"
-                    >,
-                  </span>
-                </span>
-                <span *ngIf="box.items.length > 3">...</span>
-              </ion-note>
-            </div>
+            </ion-icon>
 
-            <!-- Show matching items -->
-            <div *ngIf="hasMatchingItems(box)" class="matching-items">
-              <ion-note color="success">
-                <ion-icon name="checkmark-circle" size="small"></ion-icon>
-                Found in items:
-                <span *ngFor="let item of getMatchingItems(box); let i = index">
-                  <strong>{{ item.name }}</strong>
-                  <span *ngIf="item.quantity && item.quantity > 1">
-                    ({{ item.quantity }})</span
+            <div class="result-details">
+              <h3 class="app-text-body result-title">{{ box.name }}</h3>
+              <p class="app-text-caption" *ngIf="box.description">
+                {{ box.description }}
+              </p>
+
+              <!-- Show general items info when no specific matches -->
+              <div
+                *ngIf="box.items && box.items.length > 0 && !hasMatchingItems(box)"
+                class="items-info"
+              >
+                <ion-note color="primary" class="app-text-mono">
+                  {{ box.items.length }} item(s):
+                  <span
+                    *ngFor="let item of box.items.slice(0, 3); let i = index"
                   >
-                  <span *ngIf="item.isFragile">
-                    <ion-icon
-                      name="warning"
-                      size="small"
-                      color="warning"
-                    ></ion-icon>
+                    {{ item.name }}<span
+                      *ngIf="i < box.items.slice(0, 3).length - 1"
+                      >,
+                    </span>
                   </span>
-                  <span *ngIf="i < getMatchingItems(box).length - 1">, </span>
-                </span>
+                  <span *ngIf="box.items.length > 3">...</span>
+                </ion-note>
+              </div>
+
+              <!-- Show matching items -->
+              <div *ngIf="hasMatchingItems(box)" class="matching-items">
+                <ion-note color="success">
+                  <ion-icon name="checkmark-circle" size="small"></ion-icon>
+                  Found in items:
+                  <span
+                    *ngFor="let item of getMatchingItems(box); let i = index"
+                  >
+                    <strong>{{ item.name }}</strong>
+                    <span *ngIf="item.quantity && item.quantity > 1">
+                      ({{ item.quantity }})</span
+                    >
+                    <span *ngIf="item.isFragile">
+                      <ion-icon
+                        name="warning"
+                        size="small"
+                        color="warning"
+                      ></ion-icon>
+                    </span>
+                    <span *ngIf="i < getMatchingItems(box).length - 1"
+                      >,
+                    </span>
+                  </span>
+                </ion-note>
+              </div>
+
+              <ion-note color="medium" class="app-text-mono">
+                Created: {{ box.createdAt | date : "short" }}
               </ion-note>
             </div>
 
-            <ion-note color="medium">
-              Created: {{ box.createdAt | date:'short' }}
-            </ion-note>
-          </ion-label>
+            <ion-button
+              fill="clear"
+              class="qr-result-button"
+              (click)="$event.stopPropagation()"
+            >
+              <ion-icon name="qr-code-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card>
+      </div>
 
-          <ion-button
-            fill="clear"
-            slot="end"
-            (click)="$event.stopPropagation()"
-          >
-            <ion-icon name="qr-code-outline"></ion-icon>
-          </ion-button>
-        </ion-item>
-      </ion-list>
+      <!-- Checklist Results List -->
+      <div class="results-list" *ngIf="checklistResults.length > 0">
+        <ion-card
+          class="app-card app-card--labeled result-card"
+          *ngFor="let checklist of checklistResults"
+          [routerLink]="['/tabs/checklist', checklist.id]"
+          button
+        >
+          <div class="result-row">
+            <ion-icon
+              name="checkbox-outline"
+              slot="start"
+              color="primary"
+              size="large"
+            >
+            </ion-icon>
+
+            <div class="result-details">
+              <h3 class="app-text-body result-title">{{ checklist.title }}</h3>
+              <p class="app-text-caption" *ngIf="checklist.description">
+                {{ checklist.description }}
+              </p>
+
+              <ion-note color="primary" class="app-text-mono">
+                {{ getChecklistCompletedCount(checklist) }} of {{
+                getChecklistTotalCount(checklist) }} items completed ({{
+                getChecklistCompletionPercentage(checklist) }}%)
+              </ion-note>
+            </div>
+          </div>
+        </ion-card>
+      </div>
     </div>
   </div>
 
   <!-- Initial State -->
   <div class="empty-state" *ngIf="!hasSearched">
-    <ion-icon name="search-outline" color="medium" size="large"></ion-icon>
-    <ion-text color="medium">
-      <h3>Search Your Boxes</h3>
-      <p>
-        Search by box name, description, or item contents. You can also scan a
-        QR code to find your items quickly.
-      </p>
-    </ion-text>
+    <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+    <h2>Search Your Boxes and Checklists</h2>
+    <p>
+      Search by box name, description, item contents, or checklist title.
+      You can also scan a QR code to find your items quickly.
+    </p>
   </div>
 </ion-content>

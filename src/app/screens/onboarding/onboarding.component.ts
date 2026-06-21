@@ -18,6 +18,17 @@ export class OnboardingComponent implements OnInit {
 
   async startApp() {
     await this.storage.set('onboardingComplete', 'true');
+    this.navCtrl.navigateRoot('/tabs/home');
+  }
+
+  /**
+   * Secondary path from onboarding's final slide for users who already have
+   * an account. Onboarding is still marked complete (so AppStartupRouteService,
+   * Spec 005, continues to skip onboarding on next launch) but navigation goes
+   * to /login instead of /tabs/home.
+   */
+  async goToLogin() {
+    await this.storage.set('onboardingComplete', 'true');
     this.navCtrl.navigateRoot('/login');
   }
 

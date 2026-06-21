@@ -3,18 +3,18 @@
 
 // Variables
 :host {
-  --card-background: #222428;
-  --background-secondary: #1b2331;
-  --text-color: #ffffff;
-  --text-muted: #8c9eff;
-  --border-color: #3a4556;
+  --card-background: var(--app-card-background);
+  --background-secondary: var(--app-color-surface);
+  --text-color: var(--app-color-ink);
+  --text-muted: var(--app-color-accent-secondary);
+  --border-color: var(--app-card-border-color);
 }
 
 // Header
 ion-header {
   ion-toolbar {
-    --background: #1b233d;
-    --color: #ffffff;
+    --background: var(--app-color-surface);
+    --color: var(--app-color-ink);
 
     ion-buttons {
       ion-button {
@@ -24,7 +24,7 @@ ion-header {
         }
 
         &[color="medium"] {
-          --color: #8c9eff;
+          --color: var(--app-color-accent-secondary);
         }
       }
     }
@@ -43,8 +43,8 @@ ion-header {
 
 // Formulario de la checklist
 .checklist-form {
-  border-radius: 10px;
-  background: rgba(27, 35, 61, 0.5);
+  border-radius: var(--app-radius-md);
+  background: var(--app-card-background);
   padding: 16px;
   margin-bottom: 16px;
 
@@ -57,8 +57,8 @@ ion-header {
   }
 
   ion-item {
-    --background: #2a3142;
-    border-radius: 8px;
+    --background: var(--app-color-surface);
+    border-radius: var(--app-radius-sm);
     margin-bottom: 8px;
     --border-width: 0;
     --padding-start: 12px;
@@ -122,7 +122,7 @@ ion-header {
 // Tarjeta de ítem
 .item-card {
   margin: 0;
-  border-radius: 10px;
+  border-radius: var(--app-radius-md);
   background: var(--card-background);
   border: 1px solid var(--border-color);
 
@@ -225,8 +225,8 @@ ion-header {
 .progress-section {
   margin-top: 16px;
   padding: 12px;
-  background: #2a3142;
-  border-radius: 8px;
+  background: var(--app-color-surface);
+  border-radius: var(--app-radius-sm);
   border: 1px solid var(--border-color);
   margin-bottom: 16px;
 
@@ -274,21 +274,21 @@ ion-header {
 
 // Estilos para el footer
 ion-footer {
-  --background: #1b233d;
+  --background: var(--app-color-surface);
 
   .footer-actions {
     display: flex;
     justify-content: space-between;
     padding: 10px 16px;
-    background: #1b233d;
+    background: var(--app-color-surface);
 
     ion-button {
       font-weight: 500;
 
       &[strong="true"] {
-        --background: var(--ion-color-primary);
-        --color: white;
-        --border-radius: 4px;
+        --background: var(--app-color-accent-primary);
+        --color: var(--app-color-accent-primary-contrast);
+        --border-radius: var(--app-radius-sm);
       }
     }
   }
@@ -297,8 +297,8 @@ ion-footer {
 // Estilos específicos para ion-datetime
 :host ::ng-deep {
   ion-datetime {
-    --background: #2a3142;
-    border-radius: 8px;
+    --background: var(--app-color-surface);
+    border-radius: var(--app-radius-sm);
 
     // Aseguramos que el calendario se vea completo
     height: auto !important;
@@ -346,10 +346,10 @@ ion-footer {
   }
 
   ion-alert.select-alert {
-    --background: #1e2433;
+    --background: var(--app-overlay-background);
 
     .alert-wrapper {
-      background: #1e2433;
+      background: var(--app-overlay-background);
     }
   }
 }

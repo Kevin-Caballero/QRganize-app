@@ -1,10 +1,3 @@
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-}
-
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -14,99 +7,122 @@
   text-align: center;
   min-height: 400px;
   height: 70vh;
+  color: var(--app-color-ink);
+}
 
-  .empty-icon {
-    font-size: 80px;
-    color: var(--ion-color-medium);
-    margin-bottom: 20px;
-  }
+.empty-state .empty-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+  color: var(--ion-color-medium);
+}
 
-  h2 {
-    color: var(--ion-color-light);
-    margin-bottom: 10px;
-    font-size: 24px;
-    font-weight: 600;
-  }
+.empty-state h2 {
+  color: var(--ion-color-light);
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 600;
+}
 
-  p {
-    color: var(--ion-color-medium);
-    margin-bottom: 30px;
-    max-width: 300px;
-    line-height: 1.5;
-  }
+.empty-state p {
+  color: var(--ion-color-medium);
+  margin-bottom: 30px;
+  max-width: 300px;
+  line-height: 1.5;
+}
 
-  ion-button {
-    --border-radius: 8px;
-    --padding-top: 10px;
-    --padding-bottom: 10px;
-    --padding-start: 20px;
-    --padding-end: 20px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
+.empty-state ion-button {
+  --border-radius: 8px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  --padding-start: 20px;
+  --padding-end: 20px;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .checklists-container {
   padding: 16px;
 }
 
-.checklist-card {
+// Spec 015: checklists moved from `ion-card` to `ion-item` (required by
+// `ion-item-sliding`'s swipe-to-reveal gesture, which only supports
+// `ion-item` children). These rules reset Ionic's default `ion-item`
+// chrome so the item reads identically to the former `ion-card`-based
+// `.app-card`/`.app-card--labeled checklist-card` look. The former
+// `ion-card-header`/`ion-card-content` elements are replaced by plain
+// `div`s (`.ion-card-header`, `.checklist-card-body`) since they are not
+// guaranteed to render their intended layout/styling outside an `ion-card`.
+ion-item.checklist-card {
+  --background: var(--app-card-background);
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --inner-padding-end: 0;
+  --inner-border-width: 0;
+  --min-height: unset;
   margin-bottom: 16px;
-  border-radius: 12px;
+  border-radius: var(--app-radius-md);
   cursor: pointer;
   transition: all 0.3s ease;
 
+  &::part(native) {
+    padding: 0;
+  }
+
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--app-card-shadow);
   }
 
   &:active {
     transform: translateY(0);
   }
+}
 
-  ion-card-header {
-    padding-bottom: 8px;
+.checklist-card-body {
+  width: 100%;
+  padding: var(--app-space-md);
+}
 
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+.ion-card-header {
+  padding-bottom: 8px;
 
-      ion-card-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #ffffff;
-        flex: 1;
+  &.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    ion-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--app-color-ink);
+      flex: 1;
+      margin: 0;
+      margin-right: 12px;
+    }
+
+    .box-chip {
+      flex-shrink: 0;
+
+      ion-chip {
         margin: 0;
-        margin-right: 12px;
-      }
-
-      .box-chip {
-        flex-shrink: 0;
-
-        ion-chip {
-          margin: 0;
-          font-size: 12px;
-          height: 28px;
-        }
+        font-size: 12px;
+        height: 28px;
       }
     }
-
-    ion-card-subtitle {
-      font-size: 14px;
-      color: var(--ion-color-medium);
-      margin-top: 4px;
-    }
   }
+}
 
-  ion-card-content {
-    padding-top: 8px;
-  }
+ion-card-subtitle {
+  font-size: 14px;
+  color: var(--ion-color-medium);
+  margin-top: 4px;
 }
 
 .progress-info {
   margin-bottom: 20px;
+  padding-top: 8px;
 
   .progress-header {
     display: flex;
@@ -116,7 +132,7 @@
 
     .progress-text {
       font-size: 14px;
-      color: #b0b0b0;
+      color: var(--app-empty-state-color);
       font-weight: 500;
     }
 
@@ -133,24 +149,6 @@
   }
 }
 
-.action-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-
-  ion-button {
-    margin: 0;
-    font-size: 12px;
-    height: 32px;
-
-    ion-icon {
-      font-size: 16px;
-    }
-  }
-}
-
 // Responsive design
 @media (max-width: 768px) {
   .checklists-container {
@@ -160,35 +158,20 @@
   .checklist-card {
     margin-bottom: 12px;
   }
-
-  .action-buttons {
-    ion-button {
-      font-size: 11px;
-      height: 30px;
-    }
-  }
 }
 
 // Dark mode support
 @media (prefers-color-scheme: dark) {
-  .empty-state {
-    h2 {
-      color: var(--ion-color-light);
-    }
-  }
-
   .checklist-card {
-    ion-card-header {
-      ion-card-title {
-        color: var(--ion-color-light);
-      }
+    ion-card-title {
+      color: var(--app-color-ink);
     }
   }
 
   .progress-info {
     .progress-header {
       .progress-text {
-        color: #b0b0b0;
+        color: var(--app-empty-state-color);
       }
     }
   }

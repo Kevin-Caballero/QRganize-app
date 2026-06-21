@@ -3,55 +3,44 @@
     <ion-buttons slot="start">
       <ion-back-button (click)="goBack()"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ checklist?.name || 'Checklist' }}</ion-title>
+    <ion-title class="app-text-h1">{{ checklist?.title || 'Checklist' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" class="app-page">
   <!-- Loading Spinner -->
-  <div *ngIf="loading" class="loading-container">
+  <div *ngIf="loading" class="app-loading-state">
     <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading checklist...</p>
   </div>
 
   <!-- Content -->
   <div *ngIf="!loading && checklist">
     <!-- Checklist Header -->
     <div class="checklist-header">
-      <ion-card
-        class="checklist-card"
-        style="
-          background: #222428 !important;
-          margin: 8px;
-          border-radius: 12px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        "
-      >
-        <ion-card-header style="background: #222428 !important">
+      <ion-card class="app-card app-card--labeled checklist-card">
+        <ion-card-header>
           <div class="header-content">
-            <ion-card-title>{{ checklist.name }}</ion-card-title>
-            <!-- Box Assignment Info in header -->
-            <div class="box-chip">
-              <ion-chip color="secondary" *ngIf="checklist.boxId">
-                <ion-icon name="cube" slot="start"></ion-icon>
-                <ion-label>{{ getBoxName() }}</ion-label>
-              </ion-chip>
-              <ion-chip color="medium" *ngIf="!checklist.boxId">
-                <ion-icon name="cube-outline" slot="start"></ion-icon>
-                <ion-label>Not assigned</ion-label>
-              </ion-chip>
-            </div>
+            <ion-card-title class="app-text-h2">{{ checklist.title }}</ion-card-title>
+            <ion-chip *ngIf="boxName" color="tertiary" size="small">
+              <ion-icon name="cube-outline" size="small"></ion-icon>
+              <ion-label class="app-text-body">{{ boxName }}</ion-label>
+            </ion-chip>
           </div>
+          <ion-card-subtitle *ngIf="checklist.description" class="app-text-body">{{
+            checklist.description
+          }}</ion-card-subtitle>
         </ion-card-header>
 
-        <ion-card-content style="background: #222428 !important">
+        <ion-card-content>
           <!-- Progress Info -->
           <div class="progress-info">
             <div class="progress-header">
-              <span class="progress-text">
-                {{ getCompletedItemsCount() }} of {{ checklist.items?.length ||
-                0 }} items completed
+              <span class="progress-text app-text-body">
+                {{ getCompletedItemsCount() }} of {{ items.length }} items
+                completed
               </span>
-              <span class="progress-percentage"
+              <span class="progress-percentage app-text-mono"
                 >{{ getCompletionPercentage() }}%</span
               >
             </div>
@@ -64,31 +53,14 @@
 
           <!-- Action Buttons -->
           <div class="action-buttons">
-            <ion-button fill="clear" size="small" (click)="openEditModal()">
+            <ion-button
+              fill="clear"
+              size="small"
+              class="app-primary-action"
+              (click)="openEditModal()"
+            >
               <ion-icon name="create" slot="start"></ion-icon>
               Edit
-            </ion-button>
-
-            <ion-button
-              fill="clear"
-              size="small"
-              color="medium"
-              *ngIf="!checklist.boxId"
-              (click)="assignToBox()"
-            >
-              <ion-icon name="link" slot="start"></ion-icon>
-              Assign to Box
-            </ion-button>
-
-            <ion-button
-              fill="clear"
-              size="small"
-              color="medium"
-              *ngIf="checklist.boxId"
-              (click)="unassignFromBox()"
-            >
-              <ion-icon name="unlink" slot="start"></ion-icon>
-              Unassign
             </ion-button>
 
             <ion-button
@@ -108,7 +80,8 @@
     <!-- Checklist Items -->
     <div class="checklist-items-section">
       <app-checklist-items
-        [checklist]="checklist"
+        [checklistId]="checklist.id"
+        [items]="items"
         (checklistUpdated)="onChecklistUpdated()"
       >
       </app-checklist-items>
@@ -116,11 +89,11 @@
   </div>
 
   <!-- Error State -->
-  <div *ngIf="!loading && !checklist" class="error-state">
-    <ion-icon name="warning-outline" class="error-icon"></ion-icon>
-    <h2>Checklist Not Found</h2>
-    <p>The checklist you're looking for doesn't exist or has been deleted.</p>
-    <ion-button fill="solid" (click)="goBack()">
+  <div *ngIf="!loading && !checklist" class="app-error-state">
+    <ion-icon name="warning-outline"></ion-icon>
+    <h2 class="app-text-h2">Checklist Not Found</h2>
+    <p class="app-text-body">The checklist you're looking for doesn't exist or has been deleted.</p>
+    <ion-button fill="solid" class="app-primary-action" (click)="goBack()">
       <ion-icon name="arrow-back" slot="start"></ion-icon>
       Go Back
     </ion-button>

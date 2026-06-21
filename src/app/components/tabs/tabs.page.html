@@ -3,7 +3,7 @@
     vertical="bottom"
     horizontal="center"
     translucent="true"
-    style="margin-bottom: 28px"
+    class="qr-scanner-fab"
   >
     <ion-fab-button (click)="openQrScanner()" class="qr-scanner">
       <ion-icon name="qr-code-outline" size="large"></ion-icon>
@@ -18,13 +18,17 @@
     <ion-tab-button
       tab="checklist"
       href="/tabs/checklist"
-      style="margin-right: 10px"
+      class="tab-button-spaced-right"
     >
       <ion-icon name="checkbox-outline"></ion-icon>
       <ion-label>Checklists</ion-label>
     </ion-tab-button>
 
-    <ion-tab-button tab="search" href="/tabs/search" style="margin-left: 10px">
+    <ion-tab-button
+      tab="search"
+      href="/tabs/search"
+      class="tab-button-spaced-left"
+    >
       <ion-icon name="search-outline"></ion-icon>
       <ion-label>Search</ion-label>
     </ion-tab-button>

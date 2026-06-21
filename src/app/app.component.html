@@ -1,3 +1,16 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <!--
+    Minimal startup splash so the screen is never blank while the SQLite
+    database initializes/migrates (Spec 002 UI/UX requirement). Hidden once
+    `navCtrl.navigateRoot()` swaps in the resolved startup route; if SQLite
+    init fails, the spinner is replaced with a short, visible error message
+    instead of spinning forever.
+  -->
+  <div class="app-startup-splash" *ngIf="starting && !dbInitFailed">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+  <div class="app-startup-splash app-startup-splash--error" *ngIf="dbInitFailed">
+    <p>Something went wrong starting the app. Please restart.</p>
+  </div>
+  <ion-router-outlet *ngIf="!starting"></ion-router-outlet>
 </ion-app>
