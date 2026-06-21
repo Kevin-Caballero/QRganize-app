@@ -88,5 +88,4 @@ src/environments/environment.prod.ts
 
 .claude/
 .vscode/
-docs/
 claude.*

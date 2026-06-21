@@ -4,6 +4,25 @@
 
 A mobile application built with Ionic and Angular for organizing moving boxes using QR codes.
 
+## Screenshots
+
+| Boxes | Box Detail | Checklist |
+| --- | --- | --- |
+| ![Boxes list](docs/screenshots/boxes-list.png) | ![Box detail](docs/screenshots/box-detail.png) | ![Checklist detail](docs/screenshots/checklist-detail.png) |
+
+| Search | Settings |
+| --- | --- |
+| ![Search](docs/screenshots/search.png) | ![Settings](docs/screenshots/settings.png) |
+
+## Landing page
+
+A self-contained static landing page lives in [`docs/index.html`](docs/index.html) (no build step — plain HTML/CSS, reuses the screenshots above). To publish it on GitHub Pages:
+
+1. GitHub → this repo → **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to "Deploy from a branch".
+3. Branch: `main`, folder: **`/docs`** → **Save**.
+4. The site will be live at `https://<your-username>.github.io/<repo-name>/` within a minute or two.
+
 ## Features
 
 - **QR Code Scanning**: Scan QR codes to quickly identify boxes

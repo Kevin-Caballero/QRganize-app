@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QRganize — Move smarter, not harder</title>
+<meta name="description" content="QRganize is a mobile app that organizes your move: pack boxes, label them with QR codes, and find anything instantly by scanning." />
+<link rel="icon" href="assets/logo.png" />
+<style>
+  :root {
+    --bg: #faf6ef;
+    --surface: #fffdf8;
+    --accent: #ff5a36;
+    --accent-dark: #e04f2f;
+    --accent-2: #2d6e7e;
+    --ink: #2b231c;
+    --success: #3f8f5f;
+    --amber: #e8a33d;
+    --border: #e8dfcd;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  a { color: var(--accent-dark); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Nav */
+  nav.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+  }
+  nav.topbar .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  nav.topbar .brand img { width: 32px; height: 32px; }
+  nav.topbar a.cta {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+  }
+  nav.topbar a.cta:hover { background: var(--accent-dark); text-decoration: none; }
+
+  /* Hero */
+  header.hero {
+    text-align: center;
+    padding: 60px 24px 40px;
+  }
+  header.hero img.logo {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 16px;
+  }
+  header.hero h1 {
+    font-size: 2.4rem;
+    margin: 0 0 12px;
+    letter-spacing: -0.5px;
+  }
+  header.hero h1 .accent { color: var(--accent); }
+  header.hero p.subtitle {
+    font-size: 1.15rem;
+    color: #5c5247;
+    max-width: 560px;
+    margin: 0 auto 28px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark); text-decoration: none; }
+  .btn-outline { border: 2px solid var(--accent); color: var(--accent-dark); background: transparent; }
+  .btn-outline:hover { background: rgba(255, 90, 54, 0.08); text-decoration: none; }
+
+  .hero-shot {
+    margin: 40px auto 0;
+    max-width: 320px;
+  }
+  .hero-shot img {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 32px rgba(43, 35, 28, 0.18);
+  }
+
+  /* Features */
+  section.features {
+    padding: 60px 24px;
+  }
+  section.features h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin-bottom: 36px;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 22px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
+  .feature-card .icon { font-size: 1.8rem; margin-bottom: 10px; }
+  .feature-card h3 { margin: 0 0 8px; font-size: 1.05rem; }
+  .feature-card p { margin: 0; font-size: 0.92rem; color: #5c5247; }
+
+  /* Screenshot gallery */
+  section.gallery {
+    padding: 20px 24px 60px;
+    text-align: center;
+  }
+  section.gallery h2 {
+    font-size: 1.8rem;
+    margin-bottom: 36px;
+  }
+  .gallery-row {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    justify-content: center;
+  }
+  .gallery-row img {
+    height: 480px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 24px rgba(43, 35, 28, 0.14);
+    flex-shrink: 0;
+  }
+
+  /* Status badges demo */
+  .badge-demo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin: 4px;
+  }
+  .badge-packing { background: rgba(232, 163, 61, 0.18); color: var(--amber); }
+  .badge-sealed { background: rgba(63, 143, 95, 0.18); color: var(--success); }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px 60px;
+    color: #8a7f6f;
+    font-size: 0.9rem;
+  }
+  footer a { color: var(--accent-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav class="topbar container">
+  <div class="brand">
+    <img src="assets/logo.png" alt="QRganize logo" />
+    QRganize
+  </div>
+  <a class="cta" href="https://github.com/Kevin-Caballero/QRganize-app">View on GitHub</a>
+</nav>
+
+<header class="hero">
+  <img class="logo" src="assets/logo.png" alt="QRganize logo" />
+  <h1>Move smarter, <span class="accent">not harder</span>.</h1>
+  <p class="subtitle">
+    QRganize helps you pack, label, and find every box during a move —
+    snap a photo, print a QR code, and scan it later to instantly see
+    what's inside.
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="https://github.com/Kevin-Caballero/QRganize-app">Get the app</a>
+    <a class="btn btn-outline" href="#screenshots">See screenshots</a>
+  </div>
+  <div class="hero-shot">
+    <img src="screenshots/box-detail.png" alt="QRganize box detail screen" />
+  </div>
+</header>
+
+<section class="features container">
+  <h2>Everything you need to pack without losing your mind</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="icon">📦</div>
+      <h3>Box tracking</h3>
+      <p>Create boxes, snap a photo, and track packing progress with
+        <span class="badge-demo badge-packing">Packing</span>
+        <span class="badge-demo badge-sealed">Sealed</span>
+        status.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🏷️</div>
+      <h3>Item details</h3>
+      <p>Log items per box with quantity, fragility, expiration dates, and photos — never forget what's where.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📲</div>
+      <h3>QR labels</h3>
+      <p>Generate and print QR codes for each box, sized for the sheet — scan one to pull up its full contents instantly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">✅</div>
+      <h3>Checklists</h3>
+      <p>Plan what to pack per box; checking an item off automatically adds it as a real item in that box.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔍</div>
+      <h3>Instant search</h3>
+      <p>Find anything across boxes, items, and checklists by name, description, or contents.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔔</div>
+      <h3>Expiration reminders</h3>
+      <p>Get a local notification before perishable or time-sensitive items expire.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📡</div>
+      <h3>Works offline</h3>
+      <p>All your data lives on your device — no internet connection required for day-to-day use.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🌗</div>
+      <h3>Light &amp; dark theme</h3>
+      <p>Matches your system theme, or pick Light/Dark manually in Settings.</p>
+    </div>
+  </div>
+</section>
+
+<section class="gallery container" id="screenshots">
+  <h2>A look inside</h2>
+  <div class="gallery-row">
+    <img src="screenshots/boxes-list.png" alt="Boxes list screen" />
+    <img src="screenshots/box-detail.png" alt="Box detail screen" />
+    <img src="screenshots/checklist-detail.png" alt="Checklist detail screen" />
+    <img src="screenshots/search.png" alt="Search screen" />
+    <img src="screenshots/settings.png" alt="Settings screen" />
+  </div>
+</section>
+
+<footer>
+  Built with Ionic + Angular + Capacitor.
+  <a href="https://github.com/Kevin-Caballero/QRganize-app">Source on GitHub</a>
+</footer>
+
+</body>
+</html>
