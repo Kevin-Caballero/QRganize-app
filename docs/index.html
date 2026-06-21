@@ -154,8 +154,17 @@
     display: flex;
     gap: 20px;
     overflow-x: auto;
-    padding-bottom: 12px;
-    justify-content: center;
+    padding: 4px 4px 12px;
+    /* `justify-content: center` on an overflowing flex row clips both ends
+       equally (the browser centers the content and hides the overflow
+       without auto-scrolling into view) -- that's what cut off the first
+       and last screenshots. `margin: 0 auto` + `max-width` centers the row
+       itself as a block when there's enough room to fit everything,
+       without ever clipping; `flex-start` keeps items left-aligned inside
+       it so nothing is hidden when it does need to scroll. */
+    justify-content: flex-start;
+    max-width: 1220px;
+    margin: 0 auto;
   }
   .gallery-row img {
     height: 480px;
